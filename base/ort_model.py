@@ -1,4 +1,3 @@
-%%file base/ort_model.py
 import os
 from typing import List
 import numpy as np
