@@ -1,21 +1,8 @@
-# face-recognition
-
-
-[![License](https://img.shields.io/badge/-Medium-black?style=flat-square&logo=medium)](https://vilsonrodrigues.medium.com/chattube-chat-with-youtube-video-46a0bfc0a2e9)
-
-
-[![Licensekk](https://img.shields.io/github/license/huggingface/transformers.svg?color=blue)](https://github.com/vilsonrodrigues/face-recognition/blob/main/LICENSE)
-
+# A retrieval pipeline to face recognition  
 
 <p align="center">
-    <a href="https://circleci.com/gh/huggingface/transformers">
-        <img alt="Build" src="https://img.shields.io/circleci/build/github/huggingface/transformers/main">
-    </a>    
-    <a href="https://github.com/huggingface/transformers/blob/main/LICENSE">
-        <img alt="iuiu" src="https://img.shields.io/github/license/huggingface/transformers.svg?color=blue">
-    </a>
+    <img alt="Static Badge" src="https://img.shields.io/badge/Project_Status-Under%20Development-red">
+    <img alt="GitHub" src="https://img.shields.io/github/license/vilsonrodrigues/face-recognition.svg?color=yellow">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/vilsonrodrigues/face-recognition.svg?color=green">
+    <img alt="GitHub forks" src="https://img.shields.io/github/forks/vilsonrodrigues/face-recognition.svg?color=rose">
 </p>
-
-
-
-A end-to-end project to face recognition using only CPU
