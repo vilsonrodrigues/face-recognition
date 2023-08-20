@@ -21,7 +21,7 @@ class ONNXRuntimeModel(ModelBaseClass):
         __call__(self, input_data: np.ndarray) -> List[ort.OrtValue]
     """
 
-    def __init__(self, MODEL_PATH: str) -> None:
+    def __init__(self, MODEL_PATH: str):
         if os.path.exists(MODEL_PATH):
             self.MODEL_PATH = MODEL_PATH
             self._load_model()
