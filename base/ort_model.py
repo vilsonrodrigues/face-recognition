@@ -78,7 +78,7 @@ class ONNXRuntimeModel(ModelBaseClass):
             )
         # this code is adapted to work with 1 input and 1 output
         self._input_name = self._model.get_inputs()[0].name
-        self._output_name = model.get_outputs()[0].name
+        self._output_name = self._model.get_outputs()[0].name
 
     def _predict(
         self, 
