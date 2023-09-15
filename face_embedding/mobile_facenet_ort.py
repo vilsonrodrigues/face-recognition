@@ -15,6 +15,7 @@ class MobileFaceNetORT(ONNXRuntimeModel):
     The model `mobilefacenet_prep.onnx` contains
     preprocessing layers. The input is `(N x H x W x 3)`
 
+    Backend avaliable: `openvino` (CPU_FP16) or `cuda`
     """    
 
     def __init__(self, model_path: str, backend: Optional[str] = None):
