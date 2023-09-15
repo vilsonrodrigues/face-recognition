@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional, Union
 import numpy as np
 import onnxruntime as ort
 from base.base_models import ModelBaseClass
@@ -7,26 +7,23 @@ from base.base_models import ModelBaseClass
 class ONNXRuntimeModel(ModelBaseClass):
 
     """
-    Base class for inference in cpu or device
-
-    methods:
-        __init__(self, MODEL_PATH: str) -> None
-
-        cuda_is_avaliable() -> bool
-
-        _load_model(self) -> None
-
-        _predict(self, input_data: np.ndarray) -> List[ort.OrtValue]
-
-        __call__(self, input_data: np.ndarray) -> List[ort.OrtValue]
+    Base class for inference in cpu or backend
     """
 
-    def __init__(self, MODEL_PATH: str):
-        if os.path.exists(MODEL_PATH):
-            self.MODEL_PATH = MODEL_PATH
+    def __init__(self, model_path: str, backend: Optional[str] = None):
+        """
+        Args:
+            model_path
+            backend: backend supported are `cuda` or `openvino`.
+                     For OpenVINO install `onnxruntime-openvino` package.
+                     For CUDA use `onnxruntime-gpu`.
+        """
+        if os.path.exists(model_path):
+            self.model_path = model_path
+            self.backend = backend
             self._load_model()
         else:
-            raise ValueError(f'Model not exists in {MODEL_PATH}')
+            raise ValueError(f'Model not exists in {model_path}')
 
     @staticmethod
     def cuda_is_avaliable() -> bool:
@@ -36,26 +33,57 @@ class ONNXRuntimeModel(ModelBaseClass):
             return False
 
     def _load_model(self) -> None:
+
         sess_options = ort.SessionOptions()
+
         sess_options.log_severity_level = 4
 
         self.EP = ['CPUExecutionProvider']
 
-        if ONNXRuntimeModel.cuda_is_avaliable():
-            self.EP.insert(0, 'CUDAExecutionProvider')
-            # model optimization
-            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-            sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
-            sess_options.execution_order = ort.ExecutionOrder.PRIORITY_BASED
-            sess_options.optimized_model_filepath = self.MODEL_PATH.replace('.','_opt.')
+        provider_options = []
 
-        self._model = ort.InferenceSession(self.MODEL_PATH,
-                                           providers=self.EP,
-                                           sess_options=sess_options,
-                                           )
+        if self.backend == 'openvino':
+
+            self.EP = ['OpenVINOExecutionProvider']
+
+            # get folder from original model path
+            path_to_find = self.model_path.split('/')[-2]
+            end_index = self.model_path.find(path_to_find) + len(path_to_find)
+            cache_dir = self.model_path[:end_index]
+
+            provider_options.append(
+                {'device_type':'CPU_FP16',
+                 'enable_dynamic_shapes':True,
+                 'cache_dir': cache_dir})
+
+            # prefer OpenVINO optimizations
+            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
+
+        elif self.backend == 'cuda':
+            if ONNXRuntimeModel.cuda_is_avaliable():
+                self.EP.insert(0, 'CUDAExecutionProvider')
+                # model optimization
+                sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+                sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+                sess_options.execution_order = ort.ExecutionOrder.PRIORITY_BASED
+                sess_options.optimized_model_filepath = self.model_path.replace('.','_opt.')
+            else:
+                raise Exception('No CUDA device detected')
+
+        self._model = ort.InferenceSession(
+            self.model_path,
+            providers=self.EP,
+            sess_options=sess_options,
+            provider_options=(provider_options if provider_options else None)
+            )
+        # this code is adapted to work with 1 input and 1 output
         self._input_name = self._model.get_inputs()[0].name
+        self._output_name = model.get_outputs()[0].name
 
-    def _predict(self, input_data: np.ndarray) -> List[ort.OrtValue]:
+    def _predict(
+        self, 
+        input_data: np.ndarray
+    ) -> Union[List[ort.OrtValue], List[np.ndarray]]:
 
         if len(input_data.shape) == 3:
             # add batch dim
@@ -63,8 +91,8 @@ class ONNXRuntimeModel(ModelBaseClass):
 
         ortvalue = ort.OrtValue.ortvalue_from_numpy(input_data.astype(np.float32))
 
-        # inference on gpu
-        if ONNXRuntimeModel.cuda_is_avaliable():
+        # inference on backend
+        if self.backend:
 
             io_binding = self._model.io_binding()
 
@@ -75,7 +103,7 @@ class ONNXRuntimeModel(ModelBaseClass):
                                   shape=ortvalue.shape(),
                                   buffer_ptr=ortvalue.data_ptr())
 
-            io_binding.bind_output(None)
+            io_binding.bind_output(self._output_name)
 
             self._model.run_with_iobinding(io_binding)
 
@@ -83,7 +111,12 @@ class ONNXRuntimeModel(ModelBaseClass):
 
         # inference on cpu
         else:
-            return self._model.run_with_ort_values(None, {self._input_name: ortvalue})
+            return self._model.run_with_ort_values(
+                None,
+                {self._input_name: ortvalue})
 
-    def __call__(self, input_data: np.ndarray) -> List[ort.OrtValue]:
+    def __call__(
+        self, 
+        input_data: np.ndarray
+    ) -> Union[List[ort.OrtValue], List[np.ndarray]]:        
         return self._predict(input_data)
