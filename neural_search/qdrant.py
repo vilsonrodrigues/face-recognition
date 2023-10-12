@@ -34,6 +34,7 @@ class NeuralSearch:
         with_vectors: Optional[bool] = False,
         with_payloads: Optional[bool] = True
     ) -> List:
+
         return self.client.scroll(
             collection_name=collection_name,
             limit=limit,
@@ -86,6 +87,7 @@ class NeuralSearch:
         limit: Optional[int] = 3, # top k
         score_threshold: Optional[float] = 0.3,
     ) -> List[Dict[str, Any]]:
+
         search_result = self.client.search(
             collection_name=collection_name,
             limit=limit,
@@ -93,7 +95,9 @@ class NeuralSearch:
             score_threshold=score_threshold,
             with_payload=True
         )
+
         payloads = [hit.payload for hit in search_result]
+
         return payloads
 
     def search_batch(
@@ -103,6 +107,7 @@ class NeuralSearch:
         limit: Optional[int] = 3, # top k
         score_threshold: Optional[float] = 0.3,
     ) -> List[List[Dict[str, Any]]]:
+
         search_queries = [
             models.SearchRequest(
                 vector=embedding,
