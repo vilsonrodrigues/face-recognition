@@ -41,6 +41,13 @@ graph = (DAGDriver
                     'memory': 600,
                     'runtime_env':
                         {'image': 'rayproject/ray:2.7.0-py310'}
-                  }
+                  },
+                   health_check_period_s=10,
+                   health_check_timeout_s=30,
+                   autoscaling_config={
+                       'min_replicas': 1,
+                       'max_replicas': 2,
+                       'initial_replicas': 1,
+                   },
          )
          .bind(output))
