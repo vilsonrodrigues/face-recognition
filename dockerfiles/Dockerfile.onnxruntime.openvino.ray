@@ -4,5 +4,3 @@ ARG FULL_BASE_IMAGE=rayproject/ray:"$RAY_TAG_VERSION"
 FROM $FULL_BASE_IMAGE
 
 RUN pip install onnxruntime-openvino
-
-WORKDIR usr/src/app
