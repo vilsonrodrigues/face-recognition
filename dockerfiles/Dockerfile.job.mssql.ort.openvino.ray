@@ -1,0 +1,13 @@
+ARG RAY_TAG_VERSION="2.7.0-py310"
+ARG FULL_BASE_IMAGE=rayproject/ray:"$RAY_TAG_VERSION"
+
+FROM $FULL_BASE_IMAGE
+
+# MSSQL dependencies
+RUN apt-get update && apt-get install -y apt-transport-https
+RUN wget -qO- https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN wget -qO- https://packages.microsoft.com/config/debian/10/prod.list | tee /etc/apt/sources.list.d/msprod.list
+RUN apt-get update
+RUN ACCEPT_EULA=Y apt-get install -y msodbcsql17
+
+RUN pip install onnxruntime-openvino qdrant-client pyodbc
