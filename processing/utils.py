@@ -1,5 +1,6 @@
 import io
 import base64
+
 import numpy as np
 from PIL import Image
 
@@ -29,4 +30,10 @@ def convert_bytes_to_numpy(img_bytes: bytes) -> np.ndarray:
 
 def l2_norm_on_tensor(tensor: np.ndarray) -> np.ndarray:
     img_l2_norm = tensor / np.linalg.norm(tensor, axis=1, keepdims=True)
-    return img_l2_norm        
+    return img_l2_norm
+
+def convert_numpy_to_base64(array: np.ndarray) -> bytes:
+    array_bytes = array.tobytes()
+    base64_encoded = base64.b64encode(array_bytes)
+    base64_string = base64_encoded.decode('utf-8')
+    return base64_string
