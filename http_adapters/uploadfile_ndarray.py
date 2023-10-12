@@ -40,13 +40,13 @@ class UploadFileToNdarray:
     async def upload_image(file: UploadFile = File(description='Image with faces',
                                                           media_type='image/*')):
 
-        image_bytes = await image.read()
+        image_bytes = await file.read()
 
         try:
 
-            image = Image.open(BytesIO(image_bytes))
+            image_pillow = Image.open(BytesIO(image_bytes))
 
-            image_np = np.array(image)
+            image_np = np.array(image_pillow)
 
             return image_np
 
