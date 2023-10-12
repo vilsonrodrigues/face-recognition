@@ -45,6 +45,6 @@ class BatchFacePostProcessing(FacePostProcessing):
                     img,
                     box_rescaled[0])
 
-                faces.append(face)
+            faces.append(face)
 
         return {self.output_key: faces}
