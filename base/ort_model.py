@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional, Union
+from typing import List, Optional
 import numpy as np
 import onnxruntime as ort
 from base.base_models import ModelBaseClass
@@ -76,14 +76,19 @@ class ONNXRuntimeModel(ModelBaseClass):
             sess_options=sess_options,
             provider_options=(provider_options if provider_options else None)
             )
-        # this code is adapted to work with 1 input and 1 output
+
+        # this code is adapted to work with 1 input
         self._input_name = self._model.get_inputs()[0].name
-        self._output_name = self._model.get_outputs()[0].name
+        # but with multi output
+        output_name = []
+        for i in range(len(self._model.get_outputs())):
+            output_name.append(self._model.get_outputs()[i].name)
+        self._output_name = output_name
 
     def _predict(
-        self, 
+        self,
         input_data: np.ndarray
-    ) -> Union[List[ort.OrtValue], List[np.ndarray]]:
+    ) -> List[np.ndarray]:
 
         if len(input_data.shape) == 3:
             # add batch dim
@@ -91,8 +96,8 @@ class ONNXRuntimeModel(ModelBaseClass):
 
         ortvalue = ort.OrtValue.ortvalue_from_numpy(input_data.astype(np.float32))
 
-        # inference on backend
-        if self.backend:
+        # inference on cuda
+        if self.backend == 'cuda':
 
             io_binding = self._model.io_binding()
 
@@ -103,20 +108,25 @@ class ONNXRuntimeModel(ModelBaseClass):
                                   shape=ortvalue.shape(),
                                   buffer_ptr=ortvalue.data_ptr())
 
-            io_binding.bind_output(self._output_name)
+            for output_name in self._output_name:
+                io_binding.bind_output(output_name)
 
             self._model.run_with_iobinding(io_binding)
 
-            return io_binding.copy_outputs_to_cpu()
+            outputs = [io_binding.copy_output_to_cpu(output_name) for output_name in self._output_name]
+
+            return outputs
 
         # inference on cpu
         else:
-            return self._model.run_with_ort_values(
+            outputs = self._model.run_with_ort_values(
                 None,
                 {self._input_name: ortvalue})
+            outputs_np = [output.numpy() for output in outputs]
+            return outputs_np
 
     def __call__(
-        self, 
+        self,
         input_data: np.ndarray
-    ) -> Union[List[ort.OrtValue], List[np.ndarray]]:        
+    ) -> List[np.ndarray]:
         return self._predict(input_data)
