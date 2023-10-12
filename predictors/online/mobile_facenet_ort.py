@@ -49,11 +49,10 @@ class MobileFaceNetORTDeployment(MobileFaceNetORT):
     def _warmup(self, warmup_rounds: int) -> None:
 
         for _ in range(warmup_rounds):
-
             self._predict(np.random.rand(253, 413, 3).astype(np.uint32))
 
     def reconfigure(self, config: Dict) -> None:
-
+        
         self._handle_batch.set_max_batch_size(
             config.get('max_batch_size', 4))
 
