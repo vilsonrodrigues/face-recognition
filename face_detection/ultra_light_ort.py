@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, List
+import numpy as np
 from base.ort_model import ONNXRuntimeModel
 
 class UltraLightORT(ONNXRuntimeModel):
@@ -23,7 +24,9 @@ class UltraLightORT(ONNXRuntimeModel):
 
         The input is `(N x H x W x 3)`
 
-        The output is `(N, BOXES)`
+        The output is `(BOXES, 4)` and `(BATCH_INDICES)`
+
+    The BATCH_INDICES will tell you which batch the boxes belong to
 
     Default thresholds values are:
         IoU: 0.5
@@ -34,3 +37,35 @@ class UltraLightORT(ONNXRuntimeModel):
 
     def __init__(self, model_path: str,  backend: Optional[str] = None):
         super().__init__(model_path, backend)
+
+    def split_boxes_by_batch(
+        self,
+        boxes: np.ndarray,
+        batch_indices: np.ndarray
+    ) -> List[np.ndarray]:
+        """Split boxes by batch
+        Args:
+            boxes: (BOXES, 4)
+            batch_indices: (BATCH_INDICES) tells which batch the boxes belong to
+        Returns:
+            boxes_by_batch
+        """
+
+        max_index = batch_indices.max()
+
+        boxes_by_batch = []
+
+        for batch_idx in range(max_index+1):
+
+            if batch_idx in batch_indices:
+
+                batch_boxes = boxes[batch_indices == batch_idx]
+
+            # if not boxes detected, add a empty numpy array
+            else:
+
+                batch_boxes = np.array([])
+
+            boxes_by_batch.append(batch_boxes)
+
+        return boxes_by_batch
