@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class ModelBaseClass(ABC):
 
     """
@@ -8,8 +9,8 @@ class ModelBaseClass(ABC):
 
     @abstractmethod
     def _predict(self, input_data):
-        raise NotImplementedError('Please Implement this method')
+        raise NotImplementedError("Please Implement this method")
 
     @abstractmethod
     def __call__(self, input_data):
-        raise NotImplementedError('Please Implement this method')
+        raise NotImplementedError("Please Implement this method")

@@ -17,33 +17,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @serve.deployment(
-    name='UploadFile',
-    ray_actor_options={'num_gpus': 0.0,
-                       'num_cpus': 0.05,
-                       'memory': 100,
-                       'runtime_env':
-                            {'image': 'rayproject/ray:2.7.0-py310',
-                            #"run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
-                             }
-                       },
+    name="UploadFile",
+    ray_actor_options={
+        "num_gpus": 0.0,
+        "num_cpus": 0.05,
+        "memory": 100,
+        "runtime_env": {
+            "image": "rayproject/ray:2.7.0-py310",
+            # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
+        },
+    },
     health_check_period_s=10,
     health_check_timeout_s=30,
-    autoscaling_config={'min_replicas': 1,
-                        'max_replicas': 16,
-                        'initial_replicas': 4,},
+    autoscaling_config={
+        "min_replicas": 1,
+        "max_replicas": 16,
+        "initial_replicas": 4,
+    },
 )
 @serve.ingress(app)
 class UploadFileToNdarray:
-
-    @app.post('/')
-    async def upload_image(file: UploadFile = File(description='Image with faces',
-                                                          media_type='image/*')):
-
+    @app.post("/")
+    async def upload_image(
+        file: UploadFile = File(description="Image with faces", media_type="image/*")
+    ):
         image_bytes = await file.read()
 
         try:
-
             image_pillow = Image.open(BytesIO(image_bytes))
 
             image_np = np.array(image_pillow)
@@ -51,5 +53,4 @@ class UploadFileToNdarray:
             return image_np
 
         except:
-
-            raise HTTPException(status_code=400, detail='Invalid image format')
+            raise HTTPException(status_code=400, detail="Invalid image format")

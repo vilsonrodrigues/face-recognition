@@ -2,6 +2,7 @@ from typing import Optional, List
 import numpy as np
 from base.ort_model import ONNXRuntimeModel
 
+
 class UltraLightORT(ONNXRuntimeModel):
 
     """
@@ -35,13 +36,11 @@ class UltraLightORT(ONNXRuntimeModel):
     Backend avaliable: `openvino` (CPU_FP16) or `cuda`
     """
 
-    def __init__(self, model_path: str,  backend: Optional[str] = None):
+    def __init__(self, model_path: str, backend: Optional[str] = None):
         super().__init__(model_path, backend)
 
     def split_boxes_by_batch(
-        self,
-        boxes: np.ndarray,
-        batch_indices: np.ndarray
+        self, boxes: np.ndarray, batch_indices: np.ndarray
     ) -> List[np.ndarray]:
         """Split boxes by batch
         Args:
@@ -55,15 +54,12 @@ class UltraLightORT(ONNXRuntimeModel):
 
         boxes_by_batch = []
 
-        for batch_idx in range(max_index+1):
-
+        for batch_idx in range(max_index + 1):
             if batch_idx in batch_indices:
-
                 batch_boxes = boxes[batch_indices == batch_idx]
 
             # if not boxes detected, add a empty numpy array
             else:
-
                 batch_boxes = np.array([])
 
             boxes_by_batch.append(batch_boxes)

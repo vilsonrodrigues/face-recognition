@@ -1,6 +1,7 @@
 from typing import Optional
 from base.ort_model import ONNXRuntimeModel
 
+
 class MobileFaceNetORT(ONNXRuntimeModel):
 
     """
@@ -16,7 +17,7 @@ class MobileFaceNetORT(ONNXRuntimeModel):
     preprocessing layers. The input is `(N x H x W x 3)`
 
     Backend avaliable: `openvino` (CPU_FP16) or `cuda`
-    """    
+    """
 
     def __init__(self, model_path: str, backend: Optional[str] = None):
         super().__init__(model_path, backend)
