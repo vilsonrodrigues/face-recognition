@@ -25,29 +25,26 @@ retrieval = PipelineRetrievalLogic.bind(
 )
 
 with InputNode() as image_base64:
-
     image_np = unpack_json.base64_to_ndarray.bind(image_base64)
 
     relative_boxes = face_det.predict.bind(image_np)
 
     output = retrieval.route.bind(relative_boxes, image_np)
 
-graph = (DAGDriver
-         .options(name='driver',
-                  route_prefix='/',
-                  ray_actor_options={
-                    'num_gpus': 0.0,
-                    'num_cpus': 0.5,
-                    'memory': 600,
-                    'runtime_env':
-                        {'image': 'rayproject/ray:2.7.0-py310'}
-                  },
-                   health_check_period_s=10,
-                   health_check_timeout_s=30,
-                   autoscaling_config={
-                       'min_replicas': 1,
-                       'max_replicas': 2,
-                       'initial_replicas': 1,
-                   },
-         )
-         .bind(output))
+graph = DAGDriver.options(
+    name="driver",
+    route_prefix="/",
+    ray_actor_options={
+        "num_gpus": 0.0,
+        "num_cpus": 0.5,
+        "memory": 600,
+        "runtime_env": {"image": "rayproject/ray:2.7.0-py310"},
+    },
+    health_check_period_s=10,
+    health_check_timeout_s=30,
+    autoscaling_config={
+        "min_replicas": 1,
+        "max_replicas": 2,
+        "initial_replicas": 1,
+    },
+).bind(output)
