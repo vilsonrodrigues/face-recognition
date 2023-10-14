@@ -1,0 +1,15 @@
+ARG RAY_TAG_VERSION="2.7.1-py310"
+ARG FULL_BASE_IMAGE=rayproject/ray:"$RAY_TAG_VERSION"
+
+FROM $FULL_BASE_IMAGE
+
+COPY base/ base/
+COPY db/ db/
+COPY face_detection/ face_detection/ 
+COPY face_embedding/ face_embedding/
+COPY http_adapters/ http_adapters/
+COPY neural_search/ neural_search/
+COPY predictors/ predictors/
+COPY processing/ processing/
+COPY online_retrieval_pipeline_input_base64.py
+COPY online_retrieval_pipeline_input_uploadfile.py
