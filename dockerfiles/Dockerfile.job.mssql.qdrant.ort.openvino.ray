@@ -11,13 +11,14 @@ RUN wget -qO- https://packages.microsoft.com/config/debian/10/prod.list | tee /e
 RUN apt-get update
 RUN ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
+USER ray
 RUN pip install onnxruntime-openvino qdrant-client pyodbc
 
-COPY /base /base
-COPY /db /db
-COPY /face_detection /face_detection 
-COPY /face_embedding /face_embedding
-COPY /neural_search /neural_search
-COPY /predictors/batch /predictors/batch
-COPY /processing/batch /processing/batch
+COPY base/ base/
+COPY db/ db/
+COPY face_detection/ face_detection/ 
+COPY face_embedding/ face_embedding/
+COPY neural_search/ neural_search/
+COPY predictors/ predictors/
+COPY processing/ processing/
 COPY job_batch_pipeline_input_mssql.py job_batch_pipeline_input_mssql.py
