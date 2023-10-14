@@ -38,7 +38,7 @@ graph = DAGDriver.options(
         "num_gpus": 0.0,
         "num_cpus": 0.5,
         "memory": 600,
-        "runtime_env": {"image": "rayproject/ray:2.7.0-py310"},
+        "runtime_env": {"image": "rayproject/ray:2.7.1-py310"},
     },
     health_check_period_s=10,
     health_check_timeout_s=30,

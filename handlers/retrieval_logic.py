@@ -13,7 +13,7 @@ from ray.serve.handle import DeploymentHandle, DeploymentResponse
         "num_cpus": 0.2,
         "memory": 600,
         "runtime_env": {
-            "image": "rayproject/ray:2.7.0-py310",
+            "image": "rayproject/ray:2.7.1-py310",
             # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
         },
     },

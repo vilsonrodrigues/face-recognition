@@ -14,7 +14,7 @@ from neural_search.qdrant import NeuralSearch
         "num_cpus": 0.2,
         "memory": 600,
         "runtime_env": {
-            "image": "vilsonrodrigues/qdrant-ray:2.7.0-py310",
+            "image": "vilsonrodrigues/qdrant-ray:2.7.1-py310",
             # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
         },
     },

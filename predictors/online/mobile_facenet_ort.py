@@ -16,7 +16,7 @@ from face_embedding.mobile_facenet_ort import MobileFaceNetORT
         "num_cpus": 1.0,
         "memory": 2048,
         "runtime_env": {
-            "image": "vilsonrodrigues/onnxruntime-openvino-ray:2.7.0-py310",
+            "image": "vilsonrodrigues/ort-openvino-ray:2.7.1-py310",
             # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
         },
     },
