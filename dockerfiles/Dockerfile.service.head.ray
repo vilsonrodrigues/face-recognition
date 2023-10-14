@@ -11,5 +11,5 @@ COPY http_adapters/ http_adapters/
 COPY neural_search/ neural_search/
 COPY predictors/ predictors/
 COPY processing/ processing/
-COPY online_retrieval_pipeline_input_base64.py
-COPY online_retrieval_pipeline_input_uploadfile.py
+COPY online_retrieval_pipeline_input_base64.py online_retrieval_pipeline_input_base64.py
+COPY online_retrieval_pipeline_input_uploadfile.py online_retrieval_pipeline_input_uploadfile.py
