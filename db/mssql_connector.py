@@ -1,3 +1,4 @@
+# pip install pyodbc
 import os
 import pyodbc
 
