@@ -21,4 +21,4 @@ COPY face_embedding/ face_embedding/
 COPY neural_search/ neural_search/
 COPY predictors/ predictors/
 COPY processing/ processing/
-COPY job_batch_pipeline_input_mssql.py job_batch_pipeline_input_mssql.py
+COPY jobs/ .
