@@ -21,8 +21,8 @@ from ray.serve.handle import DeploymentHandle, DeploymentResponse
     health_check_timeout_s=30,
     autoscaling_config={
         "min_replicas": 1,
-        "max_replicas": 2,
-        "initial_replicas": 1,
+        "max_replicas": 16,
+        "initial_replicas": 4,
     },
 )
 class PipelineRetrievalLogic:
