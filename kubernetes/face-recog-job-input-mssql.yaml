@@ -39,6 +39,11 @@ spec:
                   name: dashboard
                 - containerPort: 10001
                   name: client
+                # Hence, we use the name "as-metrics" instead of "autoscaler-metrics".
+                - containerPort: 44217
+                  name: as-metrics # autoscaler
+                - containerPort: 44227
+                  name: dash-metrics # dashboard                  
           lifecycle:
             preStop:
               exec:
