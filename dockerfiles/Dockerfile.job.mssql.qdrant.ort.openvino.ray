@@ -22,3 +22,4 @@ COPY neural_search/ neural_search/
 COPY predictors/ predictors/
 COPY processing/ processing/
 COPY jobs/ .
+COPY models/ models/
