@@ -21,22 +21,24 @@ class MobileFaceNetORTBatchPredictor:
         self.input_key = input_key
         self._model = MobileFaceNetORT(model_path, backend)
 
-    def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+    def __call__(self, input_batch: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
         # the model accepts any shape, but for concantenate image batch
         # is necessary same dimensions, so, resize is used
 
-        input_batch = [
-            np.array(Image.fromarray(image).resize((112, 112)))
-            for image in batch[self.input_key]
+        batch = [
+            np.expand_dims(
+                np.array(Image.fromarray(image).resize((112, 112))), axis=0
+            )
+            for image in input_batch[self.input_key]
         ]
 
-        input_batch_np = np.array(input_batch)
+        concatenated_batch = np.concatenate(batch, axis=0)
 
-        embeddings = self._model(input_batch_np)[0]
+        embeddings = self._model(concatenated_batch)[0]
 
         embeddings = embeddings.tolist()
 
         return {
             "embedding": embeddings,
-            "face": batch[self.input_key],
+            "face": input_batch[self.input_key],
         }
