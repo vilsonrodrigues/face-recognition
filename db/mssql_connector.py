@@ -12,13 +12,4 @@ def create_connection() -> pyodbc.connect:
     DB_PASSWORD = os.getenv("MSSQL_DB_PASSWORD")
     DB_ENCRYPT = os.getenv("MSSQL_DB_ENCRYPT", default="no")
 
-    connection = (
-        "DRIVER={ODBC Driver 17 for SQL Server};"
-        "SERVER=" + DB_IP_PORT + ";"
-        "DATABASE=" + DB_NAME + ";"
-        "ENCRYPT=" + DB_ENCRYPT + ";"
-        "UID=" + DB_USER + ";"
-        "PWD=" + DB_PASSWORD
-    )
-
-    return pyodbc.connect(connection)
+    return pyodbc.connect("DRIVER={ODBC Driver 17 for SQL Server};SERVER=" + DB_IP_PORT + ";DATABASE=" + DB_NAME + ";ENCRYPT=" + DB_ENCRYPT + ";UID=" + DB_USER + ";PWD=" + DB_PASSWORD)
