@@ -1,4 +1,5 @@
 import os
+import logging
 
 import ray
 
@@ -34,6 +35,9 @@ if __name__ == "__main__":
 
     https = os.getenv("QDRANT_HTTPS", default="False")
 
+    if_create_collection = os.getenv("IF_CREATE_COLLECTION", default="False")
+    create_collection = False if if_create_collection == "True" else True
+    
     # models configs
 
     apply_resize_ul = os.getenv("APPLY_RESIZE_ULTRA_LIGHT", default="True")
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     )
 
     model_path_ultra_light = os.getenv(
-        "MODEL_PATH_ULTRA_LIGHT", default="models/mobilefacenet_prep.onnx"
+        "MODEL_PATH_ULTRA_LIGHT", default="models/ultralight_RBF_320_prep_nms.onnx"
     )
 
     # scale configs
@@ -67,7 +71,13 @@ if __name__ == "__main__":
 
     # batch app
 
+    logger = logging.getLogger("ray")
+
     ds = ray.data.read_sql(db_query, create_connection)
+
+    logger.info(f"Dataset schema: {ds.schema()}")
+    
+    logger.info(f"Dataset num lines: {ds.count()}")
 
     ns = NeuralSearch(
         url=url,
@@ -77,10 +87,11 @@ if __name__ == "__main__":
         https=(https == "True"),
     )
 
-    ns.create_collection(
-        collection_name=collection_name,
-        embedding_dim=128,
-    )
+    if create_collection:
+        ns.create_collection(
+            collection_name=collection_name,
+            embedding_dim=128,
+        )
 
     ds_payloads = ds.map_batches(
         batch_convert_bytes_to_numpy,
@@ -144,7 +155,7 @@ if __name__ == "__main__":
             zero_copy_batch=True,
             fn_kwargs=dict(input_key="face", output_key="face_base64"),
         )
-    ).materialize()
+    )
 
     ds_payloads = ds_payloads.drop_columns(["image", "foto"])
 
