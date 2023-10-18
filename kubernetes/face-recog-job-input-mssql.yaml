@@ -113,6 +113,10 @@ spec:
                 value: "True"
               - name: QDRANT_HTTPS
                 value: "False"
+                # warning, if True, a collection will be recreate from zero
+                # use if non exist
+              - name: IF_CREATE_COLLECTION
+                value: "False"
           volumes:
             - name: ray-logs
               emptyDir: {}    
