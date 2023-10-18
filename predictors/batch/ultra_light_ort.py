@@ -25,24 +25,28 @@ class UltraLightORTBatchPredictor:
         self.input_key = input_key
         self._model = UltraLightORT(model_path, backend)
 
-    def __call__(self, batch: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+    def __call__(self, input_batch: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+        # if image input not have a same dimensions
         if self.apply_resize:
-            input_batch = [
-                np.array(Image.fromarray(image).resize((320, 240)))
-                for image in batch[self.input_key]
+            batch = [
+                np.expand_dims(
+                    np.array(Image.fromarray(image).resize((320, 240))), axis=0
+                )
+                for image in input_batch[self.input_key]
             ]
 
-        # if image have a same dimension
         else:
-            input_batch = [image for image in batch[self.input_key]]
+            batch = [
+                np.expand_dims(image, axis=0) for image in input_batch[self.input_key]
+            ]
 
-        input_batch_np = np.array(input_batch)
+        concatenated_batch = np.concatenate(batch, axis=0)
 
-        boxes, batch_indices = self._model(input_batch_np)
+        boxes, batch_indices = self._model(concatenated_batch)
 
         boxes_by_batch = self._model.split_boxes_by_batch(boxes, batch_indices)
 
         return {
             "boxes": boxes_by_batch,
-            "original_image": batch[self.input_key],
+            "original_image": input_batch[self.input_key],
         }
