@@ -36,8 +36,8 @@ if __name__ == "__main__":
     https = os.getenv("QDRANT_HTTPS", default="False")
 
     if_create_collection = os.getenv("IF_CREATE_COLLECTION", default="False")
-    create_collection = False if if_create_collection == "True" else True
-    
+    create_collection = True if if_create_collection == "True" else False
+
     # models configs
 
     apply_resize_ul = os.getenv("APPLY_RESIZE_ULTRA_LIGHT", default="True")
@@ -71,12 +71,12 @@ if __name__ == "__main__":
 
     # batch app
 
-    logger = logging.getLogger("ray")
-
     ds = ray.data.read_sql(db_query, create_connection)
 
-    logger.info(f"Dataset schema: {ds.schema()}")
-    
+    logger = logging.getLogger("ray")
+
+    logger.info(f"Dataset schema: {ds.take(1)[0].keys()}")
+
     logger.info(f"Dataset num lines: {ds.count()}")
 
     ns = NeuralSearch(
