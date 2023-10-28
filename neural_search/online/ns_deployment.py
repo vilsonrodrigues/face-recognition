@@ -13,10 +13,6 @@ from neural_search.qdrant import NeuralSearch
         "num_gpus": 0.0,
         "num_cpus": 0.2,
         "memory": 600,
-        "runtime_env": {
-            "image": "vilsonrodrigues/qdrant-ray:2.7.1-py310",
-            # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
-        },
     },
     health_check_period_s=10,
     health_check_timeout_s=30,

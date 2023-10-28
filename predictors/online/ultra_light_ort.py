@@ -10,15 +10,11 @@ from face_detection.ultra_light_ort import UltraLightORT
 
 @serve.deployment(
     name="UltraLightORT",
-    user_config=dict(max_batch_size=4, batch_wait_timeout_s=0.1),
+    user_config=dict(max_batch_size=32, batch_wait_timeout_s=0.1),
     ray_actor_options={
         "num_gpus": 0.0,
         "num_cpus": 1.0,
         "memory": 2048,
-        "runtime_env": {
-            "image": "vilsonrodrigues/ort-openvino-ray:2.7.1-py310",
-            # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
-        },
     },
     health_check_period_s=10,
     health_check_timeout_s=30,
@@ -57,13 +53,13 @@ class UltraLightORTDeployment(UltraLightORT):
             self._predict(np.random.rand(253, 413, 3).astype(np.uint32))
 
     def reconfigure(self, config: Dict) -> None:
-        self._handle_batch.set_max_batch_size(config.get("max_batch_size", 4))
+        self._handle_batch.set_max_batch_size(config.get("max_batch_size", 32))
 
         self._handle_batch.set_batch_wait_timeout_s(
             config.get("batch_wait_timeout_s", 0.1)
         )
 
-    @serve.batch(max_batch_size=4, batch_wait_timeout_s=0.1)
+    @serve.batch(max_batch_size=32, batch_wait_timeout_s=0.1)
     async def _handle_batch(self, input_batch: List[np.ndarray]) -> List[np.ndarray]:
         # if image input not have a same dimensions
         if self.apply_resize:

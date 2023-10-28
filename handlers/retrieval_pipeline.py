@@ -30,10 +30,6 @@ app.add_middleware(
         "num_gpus": 0.0,
         "num_cpus": 1.0,
         "memory": 4096,
-        "runtime_env": {
-            "image": "rayproject/ray:2.7.1-py310",
-            # "run_options": ["--cap-drop SYS_ADMIN","--log-level=debug"]
-        },
     },
     health_check_period_s=10,
     health_check_timeout_s=30,
