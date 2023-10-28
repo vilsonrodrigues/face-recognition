@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import List
 
 import numpy as np
 from ray import serve
@@ -29,31 +29,34 @@ class FacePostProcessingDeployment(FacePostProcessing):
     def __init__(self):
         super().__init__()
 
-    async def apply(
+    async def apply_rescale_boxes(
         self, relative_boxes: np.ndarray, img: np.ndarray
-    ) -> Dict[str, List[Union[np.ndarray, int]]]:
+    ) -> List[int]:
+        """Apply rescale in boxes
+        Args:
+            relative_boxes: generated boxes
+            img: original image
+        Returns:
+            a boxes rescaled list
+        """
         img_shape = img.shape
+        boxes_rescaled = FacePostProcessing.rescale_boxes(
+            boxes=relative_boxes, height=img_shape[0], width=img_shape[1]
+        )
+        return boxes_rescaled
 
-        # if no face detected, return a empty list
-        if len(relative_boxes) == 0:
-            return {
-                "faces": [],
-                "boxes_rescaled": [],
-            }
-
-        else:
-            faces: List[np.ndarray] = []
-
-            boxes_rescaled = FacePostProcessing.rescale_boxes(
-                boxes=relative_boxes, height=img_shape[0], width=img_shape[1]
-            )
-
-            for box_rescaled in boxes_rescaled:
-                face = FacePostProcessing.crop_object(img, box_rescaled)
-
-                faces.append(face)
-
-            return {
-                "faces": faces,
-                "boxes_rescaled": boxes_rescaled,
-            }
+    async def apply_crop_faces(
+        self, boxes_rescaled: List[int], img: np.ndarray
+    ) -> List[np.ndarray]:
+        """Crop faces
+        Args:
+            boxes_rescaled: a boxes rescaled list
+            img: original image
+        Returns:
+            a cropped face list
+        """
+        faces: List[np.ndarray] = []
+        for box_rescaled in boxes_rescaled:
+            face = FacePostProcessing.crop_object(img, box_rescaled)
+            faces.append(face)
+        return faces
