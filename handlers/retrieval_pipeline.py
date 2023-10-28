@@ -134,5 +134,5 @@ class PipelineRetrieval:
         return response
 
     @app.get("/")
-    async def home():
+    async def home(self):
         return {"message": "Face Recogntion API"}
