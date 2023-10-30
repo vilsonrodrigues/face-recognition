@@ -93,10 +93,10 @@ class PipelineRetrieval:
             ]
 
             # gather payloads
-            payloads = await asyncio.gather(*tasks)
+            payloads = asyncio.gather(*tasks)
 
             return {
-                "payloads": payloads,
+                "payloads": await payloads,
                 "boxes": await boxes_rescaled,
             }
 
