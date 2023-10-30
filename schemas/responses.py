@@ -1,5 +1,10 @@
 from typing import Any, Dict, List, Union
 from pydantic import BaseModel
 
+class Payload(BaseModel):
+	# adapt your payload
+	...
+
 class FaceResponse(BaseModel):
-	response: Dict[str, Union[str, List[Dict[str, Any]]]]
+	payloads: List[List[Payload]]
+	boxes: List[List[int]]
