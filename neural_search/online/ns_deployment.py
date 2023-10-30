@@ -63,7 +63,7 @@ class NeuralSearchDeployment(NeuralSearch):
     async def _handle_batch(
         self, embeddings: List[List[float]]
     ) -> List[List[Dict[str, Any]]]:
-        return await self.search_batch(
+        return self.search_batch(
             collection_name=self.collection_name,
             embeddings=embeddings,
             limit=self.limit,
