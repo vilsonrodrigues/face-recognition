@@ -1,0 +1,5 @@
+onnxruntime-openvino==1.16.0
+qdrant-client==1.4.0
+python-multipart==0.0.6
+ray[serve]==2.7.1
+pillow==10.1.0
