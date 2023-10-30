@@ -7,7 +7,7 @@ from neural_search.qdrant import NeuralSearch
 @serve.deployment(
     name="NeuralSearch",
     user_config=dict(
-        max_batch_size=4, batch_wait_timeout_s=0.1, score_threshold=0.9, top_k=1
+        max_batch_size=64, batch_wait_timeout_s=0.1, score_threshold=0.9, top_k=1
     ),
     ray_actor_options={
         "num_gpus": 0.0,
@@ -49,7 +49,7 @@ class NeuralSearchDeployment(NeuralSearch):
         )
 
     def reconfigure(self, config: Dict) -> None:
-        self._handle_batch.set_max_batch_size(config.get("max_batch_size", 4))
+        self._handle_batch.set_max_batch_size(config.get("max_batch_size", 64))
 
         self._handle_batch.set_batch_wait_timeout_s(
             config.get("batch_wait_timeout_s", 0.1)
@@ -59,7 +59,7 @@ class NeuralSearchDeployment(NeuralSearch):
 
         self.limit = config.get("top_k", 1)
 
-    @serve.batch(max_batch_size=4, batch_wait_timeout_s=0.1)
+    @serve.batch(max_batch_size=64, batch_wait_timeout_s=0.1)
     async def _handle_batch(
         self, embeddings: List[List[float]]
     ) -> List[List[Dict[str, Any]]]:
