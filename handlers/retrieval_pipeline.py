@@ -125,7 +125,7 @@ class PipelineRetrieval:
         except:
             raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
 
-    @app.post("/base64")
+    @app.post("/base64", status_code=status.HTTP_200_OK)
     async def base64_router(
         self, image_base64: Annotated[str, Form(..., description="Base64 Image")]
     ):
@@ -142,6 +142,6 @@ class PipelineRetrieval:
         except:
             raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
 
-    @app.get("/")
+    @app.get("/", status_code=status.HTTP_200_OK)
     async def home(self):
         return {"message": "Face Recogntion API"}
