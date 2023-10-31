@@ -4,7 +4,14 @@ from io import BytesIO
 from typing import Annotated
 
 import numpy as np
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
+from fastapi import (
+    FastAPI, 
+    File, 
+    Form, 
+    HTTPException, 
+    UploadFile, 
+    status
+)    
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from ray import serve
