@@ -118,12 +118,12 @@ class PipelineRetrieval:
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
         except:
-            raise HTTPException(status_code=400, detail="Invalid image format")
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
         try:
             response = await self._route(image_np)
             return response
         except:
-            raise HTTPException(status_code=424, detail="Retrive failed")        
+            raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
 
     @app.post("/base64")
     async def base64_router(
@@ -135,12 +135,12 @@ class PipelineRetrieval:
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
         except:
-            raise HTTPException(status_code=400, detail="Invalid base64 image format")
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
         try:
             response = await self._route(image_np)
             return response
         except:
-            raise HTTPException(status_code=424, detail="Retrive failed")        
+            raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
 
     @app.get("/")
     async def home(self):
