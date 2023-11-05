@@ -1,4 +1,4 @@
-from typing import List
+from typing import Generator, List
 
 import numpy as np
 from ray import serve
@@ -43,16 +43,15 @@ class FacePostProcessingDeployment(FacePostProcessing):
 
     async def apply_crop_faces(
         self, boxes_rescaled: List[int], img: np.ndarray
-    ) -> List[np.ndarray]:
+    ) -> Generator[np.ndarray, None, None]:
         """Crop faces
         Args:
             boxes_rescaled: a boxes rescaled list
             img: original image
         Returns:
-            a cropped face list
+            a generator of cropped face
         """
-        faces: List[np.ndarray] = []
         for box_rescaled in boxes_rescaled:
             face = FacePostProcessing.crop_object(img, box_rescaled)
-            faces.append(face)
-        return faces
+            yield face      
+            

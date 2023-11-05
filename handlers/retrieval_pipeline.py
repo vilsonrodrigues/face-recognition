@@ -64,6 +64,10 @@ class PipelineRetrieval:
         self._face_postp: DeploymentHandle = face_postp.options(
             use_new_handle_api=True,
         )
+        self._face_postp_gen: DeploymentHandle = face_postp.options(
+            use_new_handle_api=True,
+            stream=True,
+        )
         self._neural_search: DeploymentHandle = neural_search.options(
             use_new_handle_api=True,
         )
@@ -86,17 +90,15 @@ class PipelineRetrieval:
                 relative_boxes, image_np
             )
 
-            # get faces
-            faces_ref = self._face_postp.apply_crop_faces.remote(
+            # get a faces generator
+            faces_generator = self._face_postp_gen.apply_crop_faces.remote(
                 boxes_rescaled, image_np
             )
-
-            faces = await faces_ref
 
             # async call to face emb and neural search deployment
             tasks = [
                 self._neural_search.search.remote(self._face_emb.predict.remote(face))
-                for face in faces
+                async for face in faces_generator
             ]
 
             # gather payloads
