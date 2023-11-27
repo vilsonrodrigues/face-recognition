@@ -47,6 +47,18 @@ class UltraLightORTBatchPredictor:
 
         boxes, batch_indices = self._model(concatenated_batch)
 
+        max_batch_size = len(batch)
+
+        # if no face is detected in any batch
+        if len(batch_indices) == 0:
+            # add empty arrays for each batch
+            boxes_by_batch = [np.array([[], []]) for _ in range(len(max_batch_size))]
+
+        else:
+            boxes_by_batch = self._model.split_boxes_by_batch(
+                boxes, batch_indices, max_batch_size
+            )
+
         boxes_by_batch = self._model.split_boxes_by_batch(boxes, batch_indices)
 
         return {

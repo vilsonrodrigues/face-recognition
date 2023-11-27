@@ -40,27 +40,27 @@ class UltraLightORT(ONNXRuntimeModel):
         super().__init__(model_path, backend)
 
     def split_boxes_by_batch(
-        self, boxes: np.ndarray, batch_indices: np.ndarray
+        self, boxes: np.ndarray, batch_indices: np.ndarray, max_index: int
     ) -> List[np.ndarray]:
         """Split boxes by batch
         Args:
             boxes: (BOXES, 4)
             batch_indices: (BATCH_INDICES) tells which batch the boxes belong to
+            max_index: max batch size
         Returns:
             boxes_by_batch
         """
 
-        max_index = batch_indices.max()
-
         boxes_by_batch = []
 
-        for batch_idx in range(max_index + 1):
+        for batch_idx in range(max_index):
             if batch_idx in batch_indices:
                 batch_boxes = boxes[batch_indices == batch_idx]
 
             # if not boxes detected, add a empty numpy array
             else:
-                batch_boxes = np.array([])
+                # empty array with 2-dim 
+                batch_boxes = np.array([[],[]], dtype=np.float32)
 
             boxes_by_batch.append(batch_boxes)
 

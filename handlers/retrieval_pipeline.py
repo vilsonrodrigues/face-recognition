@@ -78,7 +78,7 @@ class PipelineRetrieval:
         relative_boxes = await relative_boxes_ref
 
         # if no face detected, return a empty list
-        if len(relative_boxes) == 0:
+        if relative_boxes.size == 0:
             return {
                 "payloads": [],
                 "boxes": [],
