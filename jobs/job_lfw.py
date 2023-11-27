@@ -122,7 +122,9 @@ if __name__ == "__main__":
 
     embeddings = df_embeddings["embedding"].tolist()
 
-    payloads = ds.to_pandas().to_dict("records")
+    df = ds.to_pandas()
+    
+    payloads = [{"name": value} for value in df["name"]]
 
     ns = NeuralSearch(
         url=url,
