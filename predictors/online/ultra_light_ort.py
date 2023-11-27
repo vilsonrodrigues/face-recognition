@@ -65,7 +65,10 @@ class UltraLightORTDeployment(UltraLightORT):
         if self.apply_resize:
             batch = [
                 np.expand_dims(
-                    np.array(Image.fromarray(image).resize((320, 240))), axis=0
+                    np.array(
+                        Image.fromarray(image).resize((320, 240), Image.ANTIALIAS)
+                    ),
+                    axis=0,
                 )
                 for image in input_batch
             ]
