@@ -62,12 +62,14 @@ if __name__ == "__main__":
 
     # dataset configs
 
-    filename = "lfw_multifaces-ingestion.zip"
+    dataset_repo_id = os.getenv("DATASET_REPO_ID") 
+    filename = os.getenv("DATASET_FILENAME")
+
     local_dir = "downloads"
     dataset_dir = "dataset"
 
     hf_hub_download(
-        repo_id="vilsonrodrigues/lfw",
+        repo_id=dataset_repo_id,
         filename=filename,
         repo_type="dataset",
         local_dir=local_dir,
@@ -78,7 +80,9 @@ if __name__ == "__main__":
 
     ds = (
         ray.data.read_images(
-            os.path.join(dataset_dir, filename.split(".")[0]), include_paths=True
+            os.path.join(dataset_dir, filename.split(".")[0]),
+            include_paths=True,
+            size=(320, 240),
         )
         .map(parse_filename)
         .drop_columns("path")
@@ -123,7 +127,7 @@ if __name__ == "__main__":
     embeddings = df_embeddings["embedding"].tolist()
 
     df = ds.to_pandas()
-    
+
     payloads = [{"name": value} for value in df["name"]]
 
     ns = NeuralSearch(
