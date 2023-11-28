@@ -56,6 +56,8 @@ class UltraLightORT(ONNXRuntimeModel):
         for batch_idx in range(max_index):
             if batch_idx in batch_indices:
                 batch_boxes = boxes[batch_indices == batch_idx]
+                # fix negative values
+                batch_boxes = np.abs(batch_boxes)                
 
             # if not boxes detected, add a empty numpy array
             else:
