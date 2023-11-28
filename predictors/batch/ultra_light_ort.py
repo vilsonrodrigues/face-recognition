@@ -31,7 +31,9 @@ class UltraLightORTBatchPredictor:
             batch = [
                 np.expand_dims(
                     np.array(
-                        Image.fromarray(image).resize((320, 240), Image.ANTIALIAS)
+                        Image.fromarray(image).resize(
+                            (320, 240), Image.Resampling.LANCZOS
+                        )
                     ),
                     axis=0,
                 )

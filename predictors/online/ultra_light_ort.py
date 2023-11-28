@@ -66,7 +66,9 @@ class UltraLightORTDeployment(UltraLightORT):
             batch = [
                 np.expand_dims(
                     np.array(
-                        Image.fromarray(image).resize((320, 240), Image.ANTIALIAS)
+                        Image.fromarray(image).resize(
+                            (320, 240), Image.Resampling.LANCZOS
+                        )
                     ),
                     axis=0,
                 )
@@ -80,13 +82,17 @@ class UltraLightORTDeployment(UltraLightORT):
 
         boxes, batch_indices = self._predict(concatenated_batch)
 
+        max_batch_size = len(batch)
+
         # if no face is detected in any batch
         if len(batch_indices) == 0:
             # add empty arrays for each batch
-            boxes_by_batch = [np.array([]) for _ in range(len(input_batch))]
+            boxes_by_batch = [np.array([[], []]) for _ in range(len(input_batch))]
 
         else:
-            boxes_by_batch = self.split_boxes_by_batch(boxes, batch_indices)
+            boxes_by_batch = self._model.split_boxes_by_batch(
+                boxes, batch_indices, max_batch_size
+            )
 
         return boxes_by_batch
 

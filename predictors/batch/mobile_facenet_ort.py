@@ -27,7 +27,9 @@ class MobileFaceNetORTBatchPredictor:
 
         batch = [
             np.expand_dims(
-                np.array(Image.fromarray(image).resize((112, 112), Image.ANTIALIAS)),
+                np.array(
+                    Image.fromarray(image).resize((112, 112), Image.Resampling.LANCZOS)
+                ),
                 axis=0,
             )
             for image in input_batch[self.input_key]

@@ -59,7 +59,9 @@ class MobileFaceNetORTDeployment(MobileFaceNetORT):
     async def _handle_batch(self, input_batch: List[np.ndarray]) -> List[List[float]]:
         batch = [
             np.expand_dims(
-                np.array(Image.fromarray(image).resize((112, 112), Image.ANTIALIAS)),
+                np.array(
+                    Image.fromarray(image).resize((112, 112), Image.Resampling.LANCZOS)
+                ),
                 axis=0,
             )
             for image in input_batch
