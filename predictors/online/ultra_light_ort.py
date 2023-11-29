@@ -90,7 +90,7 @@ class UltraLightORTDeployment(UltraLightORT):
             boxes_by_batch = [np.array([[], []]) for _ in range(len(input_batch))]
 
         else:
-            boxes_by_batch = self._model.split_boxes_by_batch(
+            boxes_by_batch = self.split_boxes_by_batch(
                 boxes, batch_indices, max_batch_size
             )
 
