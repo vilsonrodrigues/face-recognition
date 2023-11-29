@@ -105,7 +105,7 @@ spec:
               - name: DATASET_REPO_ID
                 value: "vilsonrodrigues/identification-in-football"
               - name: DATASET_FILENAME
-                value: "football_ingestion_mini-sample.zip"                
+                value: "football_ingestion.zip"                
           volumes:
             - name: ray-logs
               emptyDir: {}    
