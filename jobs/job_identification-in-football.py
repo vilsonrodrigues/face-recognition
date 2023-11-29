@@ -71,6 +71,8 @@ if __name__ == "__main__":
     local_dir = "downloads"
     dataset_dir = "dataset"
 
+    print(f"Downlaod dataset {dataset_repo_id}/{filename}")
+
     hf_hub_download(
         repo_id=dataset_repo_id,
         filename=filename,
@@ -81,6 +83,10 @@ if __name__ == "__main__":
     with zipfile.ZipFile(os.path.join(local_dir, filename), "r") as zip_ref:
         zip_ref.extractall(dataset_dir)
 
+    print("Unzip dataset")        
+
+    print("Load images with Ray Data")
+
     ds = (
         ray.data.read_images(
             os.path.join(dataset_dir, filename.split(".")[0]),
@@ -89,6 +95,8 @@ if __name__ == "__main__":
         .map(parse_filename)
         .drop_columns("path")
     )
+
+    print("Start map batch processing")
 
     ds_embeddings = (
         ds.map_batches(
@@ -124,6 +132,8 @@ if __name__ == "__main__":
         )
     )
 
+    print("Batch map process finish")
+
     df_embeddings = ds_embeddings.to_pandas()
 
     embeddings = df_embeddings["embedding"].tolist()
@@ -131,6 +141,8 @@ if __name__ == "__main__":
     df = ds.to_pandas()
 
     payloads = [{"name": value} for value in df["name"]]
+
+    print("Store in qdrant")
 
     ns = NeuralSearch(
         url=url,
@@ -153,3 +165,5 @@ if __name__ == "__main__":
         payloads=payloads,
         batch_size=32,
     )
+
+    print("Complete job")
