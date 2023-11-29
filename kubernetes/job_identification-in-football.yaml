@@ -1,0 +1,139 @@
+apiVersion: ray.io/v1alpha1
+kind: RayJob
+metadata:
+  name: rayjob-foot-ingestion
+spec:
+  entrypoint: python job_identification-in-football.py
+
+  # shutdownAfterJobFinishes specifies whether the RayCluster should be deleted after the RayJob finishes. Default is false.
+  shutdownAfterJobFinishes: true
+
+  # ttlSecondsAfterFinished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+  ttlSecondsAfterFinished: 10
+
+  # Suspend specifies whether the RayJob controller should create a RayCluster instance.
+  # If a job is applied with the suspend field set to true, the RayCluster will not be created and we will wait for the transition to false.
+  # If the RayCluster is already created, it will be deleted. In the case of transition to false, a new RayCluste rwill be created.
+  # suspend: false
+
+  # rayClusterSpec specifies the RayCluster instance to be created by the RayJob controller.
+  rayClusterSpec:
+    rayVersion: '2.8.0' # should match the Ray version in the image of the containers
+    # Ray head pod template
+    headGroupSpec:
+      # The `rayStartParams` are used to configure the `ray start` command.
+      # See https://github.com/ray-project/kuberay/blob/master/docs/guidance/rayStartParams.md for the default settings of `rayStartParams` in KubeRay.
+      # See https://docs.ray.io/en/latest/cluster/cli.html#ray-start for all available options in `rayStartParams`.
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      #pod template
+      template:
+        spec:
+          containers:
+          - name: ray-head
+            image: vilsonrodrigues/face-recog-sys:job-iif-v1
+            ports:
+              - containerPort: 6379
+                name: gcs-server
+              - containerPort: 8265 # Ray dashboard
+                name: dashboard
+              - containerPort: 10001
+                name: client
+              # Hence, we use the name "as-metrics" instead of "autoscaler-metrics".
+              - containerPort: 44217
+                name: as-metrics # autoscaler
+              - containerPort: 44227
+                name: dash-metrics # dashboard
+            lifecycle:
+                preStop:
+                  exec:
+                    command: ["/bin/sh","-c","ray stop"]
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+            resources:
+              limits:
+                cpu: "0.5"
+                memory: "3Gi"
+              requests:
+                cpu: "0.5"
+                memory: "3Gi"
+            env:
+              - name: RAY_GRAFANA_IFRAME_HOST
+                value: "http://0.0.0.0:3000"
+              - name: RAY_GRAFANA_HOST
+                value: "http://prometheus-grafana.prometheus-system.svc:80"
+              - name: RAY_PROMETHEUS_HOST
+                value: "http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090"
+              #  models and func configs              
+              - name: APPLY_RESIZE_ULTRA_LIGHT
+                value: "True"
+              - name: BACKEND
+                value: "openvino"
+              - name: BATCH_SIZE_FUNCS
+                value: "4"
+              - name: BATCH_SIZE_MODELS
+                value: "4"
+              - name: MODEL_PATH_MOB_FACENET
+                value: "./models/mobilefacenet_prep.onnx"
+              - name: MODEL_PATH_ULTRA_LIGHT
+                value: "./models/ultralight_RBF_320_prep_nms.onnx"
+              - name: NUM_ACTORS_TO_BASIC_FUNC
+                value: "1"
+              - name: NUM_ACTORS_TO_MODELS
+                value: "1"
+              # Qdrant configs
+              - name: QDRANT_COLLECTION_NAME
+                value: "faces"
+              - name: QDRANT_URL
+                value: "127.0.0.1" # update
+              - name: QDRANT_PORT
+                value: "6333"
+              - name: QDRANT_GRPC_PORT
+                value: "6334"
+              - name: QDRANT_PREFER_GRPC
+                value: "True"
+              - name: QDRANT_HTTPS
+                value: "False"
+              - name: QDRANT_API_KEY
+                value: "None"                
+                # warning, if True, a collection will be recreate from zero
+                # use if non exist
+              - name: IF_CREATE_COLLECTION
+                value: "False"
+          volumes:
+            - name: ray-logs
+              emptyDir: {}    
+    workerGroupSpecs:
+    # big replicas are better than many small replicas. Reduce communication overhead
+    # the pod replicas in this group typed worker
+    - replicas: 1
+      minReplicas: 1
+      maxReplicas: 1
+      groupName: small-group
+      rayStartParams: {}
+      #pod template
+      template:
+        spec:
+          containers:
+          - name: ray-worker
+            image: vilsonrodrigues/face-recog-sys:job-iif-v1
+            lifecycle:
+              preStop:
+                exec:
+                  command: ["/bin/sh","-c","ray stop"]
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+            resources:
+              limits:
+                cpu: "5"
+                memory: "23Gi"
+              requests:
+                cpu: "5"
+                memory: "23Gi"
+          # use volumes
+          # Refer to https://kubernetes.io/docs/concepts/storage/volumes/
+          volumes:
+            - name: ray-logs
+              emptyDir: {}

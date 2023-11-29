@@ -12,6 +12,7 @@ class NeuralSearch:
         prefer_grpc: Optional[Union[bool, None]] = False,
         url: Optional[Union[str, None]] = None,
         https: Optional[bool] = None,
+        api_key: Optional[str] = None,
     ):
         self.client = QdrantClient(
             location=location,
@@ -21,6 +22,7 @@ class NeuralSearch:
             grpc_port=grpc_port,
             https=https,
             prefer_grpc=prefer_grpc,
+            api_key=api_key,
         )
 
     def get_collections(self):

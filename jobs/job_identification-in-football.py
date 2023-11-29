@@ -32,6 +32,9 @@ if __name__ == "__main__":
 
     https = os.getenv("QDRANT_HTTPS", default="False")
 
+    api_key_env = os.getenv("QDRANT_API_KEY", default="None")
+    api_key = api_key_env if api_key_env != "None" else None
+
     if_create_collection = os.getenv("IF_CREATE_COLLECTION", default="False")
     create_collection = True if if_create_collection == "True" else False
 
@@ -82,7 +85,6 @@ if __name__ == "__main__":
         ray.data.read_images(
             os.path.join(dataset_dir, filename.split(".")[0]),
             include_paths=True,
-            size=(320, 240),
         )
         .map(parse_filename)
         .drop_columns("path")
@@ -136,6 +138,7 @@ if __name__ == "__main__":
         grpc_port=grpc_port,
         prefer_grpc=(prefer_grpc == "True"),
         https=(https == "True"),
+        api_key=api_key,
     )
 
     if create_collection:

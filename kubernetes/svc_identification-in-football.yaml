@@ -1,0 +1,259 @@
+# Make sure to increase resource requests and limits before using this example in production.
+# For examples with more realistic resource configuration, see
+# ray-cluster.complete.large.yaml and
+# ray-cluster.autoscaler.large.yaml.
+apiVersion: ray.io/v1alpha1
+kind: RayService
+metadata:
+  name: rayservice-recog
+spec:
+  serviceUnhealthySecondThreshold: 900 # Config for the health check threshold for Ray Serve applications. Default value is 900.
+  deploymentUnhealthySecondThreshold: 300 # Config for the health check threshold for Ray dashboard agent. Default value is 300.
+  # serveConfigV2 takes a yaml multi-line scalar, which should be a Ray Serve multi-application config. See https://docs.ray.io/en/latest/serve/multi-app.html.
+  # Only one of serveConfig and serveConfigV2 should be used.
+  # This file was generated using the `serve build` command on Ray v2.7.1.
+  serveConfigV2: |    
+    proxy_location: EveryNode
+
+    http_options:
+
+      host: 0.0.0.0
+
+      port: 8000
+
+    grpc_options:
+
+      port: 9000
+
+      grpc_servicer_functions: []
+
+    applications:
+
+    - name: app1
+
+      route_prefix: /
+
+      import_path: app:pipeline
+
+      runtime_env: {}
+
+      deployments:
+
+      - name: UltraLightORT
+        user_config:
+          max_batch_size: 32
+          batch_wait_timeout_s: 0.1
+        autoscaling_config:
+          min_replicas: 1
+          initial_replicas: 1
+          max_replicas: 4
+          target_num_ongoing_requests_per_replica: 1.0
+          metrics_interval_s: 10.0
+          look_back_period_s: 30.0
+          smoothing_factor: 1.0
+          upscale_smoothing_factor: null
+          downscale_smoothing_factor: null
+          downscale_delay_s: 600.0
+          upscale_delay_s: 30.0
+        health_check_period_s: 10.0
+        health_check_timeout_s: 30.0
+        ray_actor_options:
+          num_cpus: 1.0
+          num_gpus: 0.0
+          memory: 2048.0
+      - name: MobileFaceNetORT
+        user_config:
+          max_batch_size: 32
+          batch_wait_timeout_s: 0.1
+        autoscaling_config:
+          min_replicas: 1
+          initial_replicas: 1
+          max_replicas: 4
+          target_num_ongoing_requests_per_replica: 1.0
+          metrics_interval_s: 10.0
+          look_back_period_s: 30.0
+          smoothing_factor: 1.0
+          upscale_smoothing_factor: null
+          downscale_smoothing_factor: null
+          downscale_delay_s: 600.0
+          upscale_delay_s: 30.0
+        health_check_period_s: 10.0
+        health_check_timeout_s: 30.0
+        ray_actor_options:
+          num_cpus: 1.0
+          num_gpus: 0.0
+          memory: 2048.0
+      - name: FacePostProcessing
+        autoscaling_config:
+          min_replicas: 1
+          initial_replicas: 4
+          max_replicas: 16
+          target_num_ongoing_requests_per_replica: 1.0
+          metrics_interval_s: 10.0
+          look_back_period_s: 30.0
+          smoothing_factor: 1.0
+          upscale_smoothing_factor: null
+          downscale_smoothing_factor: null
+          downscale_delay_s: 600.0
+          upscale_delay_s: 30.0
+        health_check_period_s: 10.0
+        health_check_timeout_s: 30.0
+        ray_actor_options:
+          num_cpus: 0.05
+          num_gpus: 0.0
+          memory: 100.0
+      - name: NeuralSearch
+        user_config:
+          max_batch_size: 4
+          batch_wait_timeout_s: 0.1
+          score_threshold: 0.9
+          top_k: 1
+        autoscaling_config:
+          min_replicas: 1
+          initial_replicas: 1
+          max_replicas: 2
+          target_num_ongoing_requests_per_replica: 1.0
+          metrics_interval_s: 10.0
+          look_back_period_s: 30.0
+          smoothing_factor: 1.0
+          upscale_smoothing_factor: null
+          downscale_smoothing_factor: null
+          downscale_delay_s: 600.0
+          upscale_delay_s: 30.0
+        health_check_period_s: 10.0
+        health_check_timeout_s: 30.0
+        ray_actor_options:
+          num_cpus: 0.2
+          num_gpus: 0.0
+          memory: 600.0
+      - name: RetrievalHandler
+        autoscaling_config:
+          min_replicas: 1
+          initial_replicas: 1
+          max_replicas: 2
+          target_num_ongoing_requests_per_replica: 1.0
+          metrics_interval_s: 10.0
+          look_back_period_s: 30.0
+          smoothing_factor: 1.0
+          upscale_smoothing_factor: null
+          downscale_smoothing_factor: null
+          downscale_delay_s: 600.0
+          upscale_delay_s: 30.0
+        health_check_period_s: 10.0
+        health_check_timeout_s: 30.0
+        ray_actor_options:
+          num_cpus: 1.0
+          num_gpus: 0.0
+          memory: 4096.0
+  rayClusterConfig:
+    rayVersion: '2.7.1' # should match the Ray version in the image of the containers
+    ######################headGroupSpecs#################################
+    # Ray head pod template.
+    headGroupSpec:
+      # The `rayStartParams` are used to configure the `ray start` command.
+      # See https://github.com/ray-project/kuberay/blob/master/docs/guidance/rayStartParams.md for the default settings of `rayStartParams` in KubeRay.
+      # See https://docs.ray.io/en/latest/cluster/cli.html#ray-start for all available options in `rayStartParams`.
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      #pod template
+      template:
+        spec:
+          containers:
+          - name: ray-head
+            image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+            resources:
+              limits:
+                cpu: 1
+                memory: 4Gi
+              requests:
+                cpu: 1
+                memory: 4Gi
+            ports:
+              - containerPort: 6379
+                name: gcs-server
+              - containerPort: 8265 # Ray dashboard
+                name: dashboard
+              - containerPort: 10001
+                name: client
+              - containerPort: 8000
+                name: serve
+              - containerPort: 44217
+                name: as-metrics # autoscaler
+              - containerPort: 44227
+                name: dash-metrics # dashboard                  
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+            env:
+              - name: RAY_GRAFANA_IFRAME_HOST
+                value: http://0.0.0.0:3000
+              - name: RAY_GRAFANA_HOST
+                value: http://prometheus-grafana.prometheus-system.svc:80
+              - name: RAY_PROMETHEUS_HOST
+                value: http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090
+              #  models and func configs              
+              - name: APPLY_RESIZE
+                value: "True"
+              - name: BACKEND_MOB_FACENET
+                value: "openvino"
+              - name: BACKEND_ULTRA_LIGHT  
+                value: "openvino"                
+              - name: WARMUP_ROUNDS
+                value: "3"
+              # Qdrant configs
+              - name: QDRANT_COLLECTION_NAME
+                value: "faces"
+              - name: QDRANT_URL
+                value: "0.0.0.0"
+              - name: QDRANT_PORT
+                value: "6333"
+              - name: QDRANT_GRPC_PORT
+                value: "6334"
+              - name: QDRANT_PREFER_GRPC
+                value: "True"
+              - name: QDRANT_HTTPS
+                value: "False"
+              - name: QDRANT_TOP_K
+                value: "1"
+              - name: QDRANT_API_KEY
+                value: "None"                      
+          volumes:
+            - name: ray-logs
+              emptyDir: {}    
+    workerGroupSpecs:
+      # the pod replicas in this group typed worker
+      # few big pods are better than many small pods
+      - replicas: 1
+        minReplicas: 1
+        maxReplicas: 2
+        # logical group name, for this called small-group, also can be functional
+        groupName: worker-group
+        # The `rayStartParams` are used to configure the `ray start` command.
+        # See https://github.com/ray-project/kuberay/blob/master/docs/guidance/rayStartParams.md for the default settings of `rayStartParams` in KubeRay.
+        # See https://docs.ray.io/en/latest/cluster/cli.html#ray-start for all available options in `rayStartParams`.
+        rayStartParams: {}
+        #pod template
+        template:
+          spec:
+            containers:
+            - name: ray-worker # must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc'
+              image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+              lifecycle:
+                preStop:
+                  exec:
+                    command: ["/bin/sh","-c","ray stop"]
+              volumeMounts:
+                - mountPath: /tmp/ray
+                  name: ray-logs
+              resources:
+                limits:
+                  cpu: "4"
+                  memory: "15Gi"
+                requests:
+                  cpu: "4"
+                  memory: "15Gi"
+            # use volumes
+            # Refer to https://kubernetes.io/docs/concepts/storage/volumes/
+            volumes:
+              - name: ray-logs
+                emptyDir: {}

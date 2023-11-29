@@ -40,12 +40,16 @@ class NeuralSearchDeployment(NeuralSearch):
 
         https = os.getenv("QDRANT_HTTPS", default="False")
 
+        api_key_env = os.getenv("QDRANT_API_KEY", default="None")
+        api_key = api_key_env if api_key_env != "None" else None
+
         super().__init__(
             url=url,
             port=port,
             grpc_port=grpc_port,
             prefer_grpc=(prefer_grpc == "True"),
             https=(https == "True"),
+            api_key=api_key
         )
 
     def reconfigure(self, config: Dict) -> None:
