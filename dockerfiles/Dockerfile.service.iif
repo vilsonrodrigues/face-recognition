@@ -1,0 +1,19 @@
+ARG RAY_TAG_VERSION="2.7.1-py310"
+ARG FULL_BASE_IMAGE=rayproject/ray:"$RAY_TAG_VERSION"
+
+FROM $FULL_BASE_IMAGE
+
+COPY requirements-svc.txt .
+
+RUN pip install -r requirements-svc.txt
+
+COPY base/ base/
+COPY face_detection/ face_detection/ 
+COPY face_embedding/ face_embedding/
+COPY handlers/ handlers/
+COPY models/ models/
+COPY neural_search/ neural_search/
+COPY predictors/ predictors/
+COPY processing/ processing/
+COPY schemas/ schemas/
+COPY app.py .
