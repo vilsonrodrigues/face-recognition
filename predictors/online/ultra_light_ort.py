@@ -10,7 +10,7 @@ from face_detection.ultra_light_ort import UltraLightORT
 
 @serve.deployment(
     name="UltraLightORT",
-    user_config=dict(max_batch_size=32, batch_wait_timeout_s=0.1),
+    user_config=dict(max_batch_size=32, batch_wait_timeout_s=0.05),
     ray_actor_options={
         "num_gpus": 0.0,
         "num_cpus": 1.0,
@@ -56,10 +56,10 @@ class UltraLightORTDeployment(UltraLightORT):
         self._handle_batch.set_max_batch_size(config.get("max_batch_size", 32))
 
         self._handle_batch.set_batch_wait_timeout_s(
-            config.get("batch_wait_timeout_s", 0.1)
+            config.get("batch_wait_timeout_s", 0.05)
         )
 
-    @serve.batch(max_batch_size=32, batch_wait_timeout_s=0.1)
+    @serve.batch(max_batch_size=32, batch_wait_timeout_s=0.05)
     async def _handle_batch(self, input_batch: List[np.ndarray]) -> List[np.ndarray]:
         # if image input not have a same dimensions
         if self.apply_resize:
