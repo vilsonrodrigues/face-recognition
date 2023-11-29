@@ -31,7 +31,7 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-sys:job-iif-v2
+            image: vilsonrodrigues/face-recog-sys:job-iif-v3
             ports:
               - containerPort: 6379
                 name: gcs-server
@@ -94,13 +94,13 @@ spec:
               - name: QDRANT_PREFER_GRPC
                 value: "True"
               - name: QDRANT_HTTPS
-                value: "False"
+                value: "True"
               - name: QDRANT_API_KEY
                 value: "None"                
                 # warning, if True, a collection will be recreate from zero
                 # use if non exist
               - name: IF_CREATE_COLLECTION
-                value: "False"
+                value: "True"
               # dataset configs
               - name: DATASET_REPO_ID
                 value: "vilsonrodrigues/identification-in-football"
@@ -122,7 +122,7 @@ spec:
         spec:
           containers:
           - name: ray-worker
-            image: vilsonrodrigues/face-recog-sys:job-iif-v2
+            image: vilsonrodrigues/face-recog-sys:job-iif-v3
             lifecycle:
               preStop:
                 exec:
