@@ -42,7 +42,7 @@ spec:
       - name: UltraLightORT
         user_config:
           max_batch_size: 32
-          batch_wait_timeout_s: 0.1
+          batch_wait_timeout_s: 0.05
         autoscaling_config:
           min_replicas: 1
           initial_replicas: 1
@@ -57,14 +57,10 @@ spec:
           upscale_delay_s: 30.0
         health_check_period_s: 10.0
         health_check_timeout_s: 30.0
-        ray_actor_options:
-          num_cpus: 1.0
-          num_gpus: 0.0
-          memory: 2048.0
       - name: MobileFaceNetORT
         user_config:
           max_batch_size: 32
-          batch_wait_timeout_s: 0.1
+          batch_wait_timeout_s: 0.05
         autoscaling_config:
           min_replicas: 1
           initial_replicas: 1
@@ -79,10 +75,6 @@ spec:
           upscale_delay_s: 30.0
         health_check_period_s: 10.0
         health_check_timeout_s: 30.0
-        ray_actor_options:
-          num_cpus: 1.0
-          num_gpus: 0.0
-          memory: 2048.0
       - name: FacePostProcessing
         autoscaling_config:
           min_replicas: 1
@@ -98,14 +90,10 @@ spec:
           upscale_delay_s: 30.0
         health_check_period_s: 10.0
         health_check_timeout_s: 30.0
-        ray_actor_options:
-          num_cpus: 0.05
-          num_gpus: 0.0
-          memory: 100.0
       - name: NeuralSearch
         user_config:
           max_batch_size: 4
-          batch_wait_timeout_s: 0.1
+          batch_wait_timeout_s: 0.05
           score_threshold: 0.9
           top_k: 1
         autoscaling_config:
@@ -122,10 +110,6 @@ spec:
           upscale_delay_s: 30.0
         health_check_period_s: 10.0
         health_check_timeout_s: 30.0
-        ray_actor_options:
-          num_cpus: 0.2
-          num_gpus: 0.0
-          memory: 600.0
       - name: RetrievalHandler
         autoscaling_config:
           min_replicas: 1
@@ -141,12 +125,8 @@ spec:
           upscale_delay_s: 30.0
         health_check_period_s: 10.0
         health_check_timeout_s: 30.0
-        ray_actor_options:
-          num_cpus: 1.0
-          num_gpus: 0.0
-          memory: 4096.0
   rayClusterConfig:
-    rayVersion: '2.7.1' # should match the Ray version in the image of the containers
+    rayVersion: '2.8.0' # should match the Ray version in the image of the containers
     ######################headGroupSpecs#################################
     # Ray head pod template.
     headGroupSpec:
@@ -160,14 +140,14 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+            image: vilsonrodrigues/face-recog-sys:svc-iif-v2
             resources:
               limits:
-                cpu: 1
-                memory: 4Gi
+                cpu: 0.5
+                memory: 3Gi
               requests:
-                cpu: 1
-                memory: 4Gi
+                cpu: 0.5
+                memory: 3Gi
             ports:
               - containerPort: 6379
                 name: gcs-server
@@ -225,7 +205,7 @@ spec:
       # few big pods are better than many small pods
       - replicas: 1
         minReplicas: 1
-        maxReplicas: 2
+        maxReplicas: 1
         # logical group name, for this called small-group, also can be functional
         groupName: worker-group
         # The `rayStartParams` are used to configure the `ray start` command.
@@ -237,7 +217,7 @@ spec:
           spec:
             containers:
             - name: ray-worker # must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc'
-              image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+              image: vilsonrodrigues/face-recog-sys:svc-iif-v2
               lifecycle:
                 preStop:
                   exec:
@@ -247,11 +227,11 @@ spec:
                   name: ray-logs
               resources:
                 limits:
-                  cpu: "4"
-                  memory: "15Gi"
+                  cpu: "2.5"
+                  memory: "5Gi"
                 requests:
-                  cpu: "4"
-                  memory: "15Gi"
+                  cpu: "2.5"
+                  memory: "5Gi"
             # use volumes
             # Refer to https://kubernetes.io/docs/concepts/storage/volumes/
             volumes:
