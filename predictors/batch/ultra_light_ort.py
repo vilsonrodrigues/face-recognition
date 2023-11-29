@@ -61,8 +61,6 @@ class UltraLightORTBatchPredictor:
                 boxes, batch_indices, max_batch_size
             )
 
-        boxes_by_batch = self._model.split_boxes_by_batch(boxes, batch_indices)
-
         return {
             "boxes": boxes_by_batch,
             "original_image": input_batch[self.input_key],
