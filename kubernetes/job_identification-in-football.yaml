@@ -132,11 +132,11 @@ spec:
                 name: ray-logs
             resources:
               limits:
-                cpu: "3"
-                memory: "8Gi"
+                cpu: "2.5"
+                memory: "5Gi"
               requests:
-                cpu: "3"
-                memory: "8Gi"
+                cpu: "2.5"
+                memory: "5Gi"
           # use volumes
           # Refer to https://kubernetes.io/docs/concepts/storage/volumes/
           volumes:
