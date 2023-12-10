@@ -36,8 +36,8 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 
     app = FastAPI()
 
-    @app.get("/protected")
-    def get_protected_data(token: str = Depends(verify_token)):
+    @app.post("/protected", dependencies=[Depends(verify_token)])
+    async def get_protected_data(content: str):
         # Your protected resource logic here
         return {"message": "Access granted to protected data"}
     ```
