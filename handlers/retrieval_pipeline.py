@@ -17,6 +17,7 @@ from PIL import Image
 from ray import serve
 from ray.serve.handle import DeploymentHandle
 
+from processing.utils import check_img_channels
 from schemas.responses import FaceResponse
 
 app = FastAPI()
@@ -119,6 +120,8 @@ class PipelineRetrieval:
         try:
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
+            if check_img_channels(image_np) == False:
+                raise ValueError("Image has invalid dimensions")            
         except:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
         try:
@@ -136,6 +139,8 @@ class PipelineRetrieval:
             image_bytes = base64.b64decode(image_base64)
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
+            if check_img_channels(image_np) == False:
+                raise ValueError("Image has invalid dimensions")                 
         except:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
         try:
