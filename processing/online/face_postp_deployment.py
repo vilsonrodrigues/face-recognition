@@ -4,7 +4,7 @@ import numpy as np
 from ray import serve
 
 from processing.face_postp import FacePostProcessing
-
+from processing.utils import check_img_channels
 
 @serve.deployment(
     name="FacePostProcessing",
@@ -27,7 +27,7 @@ class FacePostProcessingDeployment(FacePostProcessing):
 
     async def apply_rescale_boxes(
         self, relative_boxes: np.ndarray, img: np.ndarray
-    ) -> List[int]:
+    ) -> List[List[int]]:
         """Apply rescale in boxes
         Args:
             relative_boxes: generated boxes
@@ -42,7 +42,7 @@ class FacePostProcessingDeployment(FacePostProcessing):
         return boxes_rescaled
 
     async def apply_crop_faces(
-        self, boxes_rescaled: List[int], img: np.ndarray
+        self, boxes_rescaled: List[List[int]], img: np.ndarray
     ) -> Generator[np.ndarray, None, None]:
         """Crop faces
         Args:
@@ -53,5 +53,8 @@ class FacePostProcessingDeployment(FacePostProcessing):
         """
         for box_rescaled in boxes_rescaled:
             face = FacePostProcessing.crop_object(img, box_rescaled)
-            yield face      
-            
+            # checks if any image dimension is invalid, if so, keep the original image
+            if check_img_channels(face) == False:
+                raise ValueError("Cut face has invalid dimensions")
+            else:
+                yield face      
