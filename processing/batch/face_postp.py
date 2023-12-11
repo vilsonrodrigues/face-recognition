@@ -1,7 +1,7 @@
 from typing import Dict, List
 import numpy as np
 from processing.face_postp import FacePostProcessing
-
+from processing.utils import check_img_channels
 
 class BatchFacePostProcessing(FacePostProcessing):
     def __init__(self, input_key: str = "image", output_key: str = "faces"):
@@ -28,6 +28,10 @@ class BatchFacePostProcessing(FacePostProcessing):
 
                 # if many boxes detected, keep the first
                 face = FacePostProcessing.crop_object(img, box_rescaled[0])
+
+                # checks if any image dimension is invalid, if so, keep the original image
+                if check_img_channels(face) == False:
+                    face = img                
 
             faces.append(face)
 
