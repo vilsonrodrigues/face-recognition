@@ -11,9 +11,9 @@ def check_img_channels(image: np.ndarray) -> bool:
 
     The function performs the following checks:
     0. Checks if there are three color channels.
-    1. Checks if the first channel is greater than 0.
-    2. Checks if the second channel is greater than 0.
-    3. Checks if the third channel is greater than 0.
+    1. Check if the first channel is less than or equal to 0.
+    2. Check if the second channel is less than or equal to 0
+    3. Check if the third channel is less than or equal to 0.
 
     If any of these checks fail, the function returns False. Otherwise, it returns True.
 
@@ -27,16 +27,16 @@ def check_img_channels(image: np.ndarray) -> bool:
     if image.ndim != 3 or image.shape[2] != 3:
         return False
 
-    # Check if the first channel is greater than 0
-    if np.max(image[:, :, 0]) <= 0:
+    # Check if the first channel is less than or equal to 0
+    if image.shape[0] <= 0:
         return False
 
-    # Check if the second channel is greater than 0
-    if np.max(image[:, :, 1]) <= 0:
+    # Check if the second channel is less than or equal to 0
+    if image.shape[1] <= 0:
         return False
 
-    # Check if the third channel is greater than 0
-    if np.max(image[:, :, 2]) <= 0:
+    # Check if the third channel is less than or equal to 0
+    if image.shape[2] <= 0:
         return False
 
     return True
