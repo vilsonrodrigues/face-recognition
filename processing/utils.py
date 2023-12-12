@@ -75,7 +75,7 @@ def validate_img_bytes_to_numpy(sample, input_key: str) -> bool:
     Example:
     ``` python
     from functools import partial
-    ds = ds.filter(partial(validate_image_bytes, "image"))    
+    ds = ds.filter(partial(validate_img_bytes_to_numpy, "image"))    
     ```
     """
     try:
