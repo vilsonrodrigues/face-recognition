@@ -64,7 +64,7 @@ def convert_numpy_to_base64(array: np.ndarray) -> bytes:
     base64_string = base64_encoded.decode("utf-8")
     return base64_string
 
-def validate_img_bytes_numpy(sample, input_key: str) -> bool:
+def validate_img_bytes_to_numpy(sample, input_key: str) -> bool:
     """ Helper function to filter images into bytes that cannot be converted to numpy
     Args:
         sample: ray dataset sample
