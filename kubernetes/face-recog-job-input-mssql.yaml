@@ -76,6 +76,8 @@ spec:
                 value: "password" # update
               - name: MSSQL_DB_IP_PORT
                 value: "172.0.0.1,14334" # update
+              - name: IMAGE_INPUT_KEY
+                value: "photo" # update
               #  models and func configs              
               - name: APPLY_RESIZE_ULTRA_LIGHT
                 value: "True"
