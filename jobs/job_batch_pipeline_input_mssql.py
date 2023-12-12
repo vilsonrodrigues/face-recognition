@@ -1,5 +1,6 @@
 import os
 import logging
+from functools import partial
 
 import ray
 
@@ -13,6 +14,8 @@ from processing.batch.utils_batch import (
     batch_convert_bytes_to_numpy,
     batch_convert_numpy_to_base64,
 )
+from processing.utils import validate_img_bytes_to_numpy
+
 
 if __name__ == "__main__":
     # getenvs
@@ -69,13 +72,18 @@ if __name__ == "__main__":
 
     num_actors_to_models = int(os.getenv("NUM_ACTORS_TO_MODELS", default="1"))
 
-    # batch app
+    # data access
 
-    ds = ray.data.read_sql(db_query, create_connection)
+    # this env say which the column from image in database       
+    img_input_key = int(os.getenv("IMAGE_INPUT_KEY"))
+
+    # batch app
 
     logger = logging.getLogger("ray")
 
-    logger.info(f"Dataset schema: {ds.take(1)[0].keys()}")
+    ds = ray.data.read_sql(db_query, create_connection)
+
+    ds = ds.filter(partial(validate_img_bytes_to_numpy, img_input_key))   
 
     logger.info(f"Dataset num lines: {ds.count()}")
 
@@ -100,7 +108,7 @@ if __name__ == "__main__":
         num_cpus=num_cpus_to_basic_func,
         compute=ray.data.ActorPoolStrategy(size=num_actors_to_basic_func),
         zero_copy_batch=True,
-        fn_kwargs=dict(input_key="foto", output_key="image"),
+        fn_kwargs=dict(input_key=img_input_key, output_key="image"),
     ).map_batches(
         batch_convert_bytes_to_base64,
         batch_format="pandas",
@@ -108,7 +116,7 @@ if __name__ == "__main__":
         compute=ray.data.ActorPoolStrategy(size=num_actors_to_basic_func),
         batch_size=batch_size_funcs,
         zero_copy_batch=True,
-        fn_kwargs=dict(input_key="foto", output_key="foto_base64"),
+        fn_kwargs=dict(input_key=img_input_key, output_key=f"{img_input_key}_base64"),
     )
 
     ds_embeddings = (
@@ -157,7 +165,7 @@ if __name__ == "__main__":
         )
     )
 
-    ds_payloads = ds_payloads.drop_columns(["image", "foto"])
+    ds_payloads = ds_payloads.drop_columns(["image", img_input_key])
 
     payloads = (
         ds_payloads.zip(ds_embeddings.select_columns(["face_base64"]))
