@@ -1,7 +1,7 @@
 apiVersion: ray.io/v1alpha1
 kind: RayJob
 metadata:
-  name: rayjob-face-recognition
+  name: rayjob-face-recog-mssql
 spec:
   entrypoint: python job_batch_pipeline_input_mssql.py
 
@@ -31,7 +31,7 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-job:2.7.1-py310-ort-openvino-mssql-qdrant
+            image: vilsonrodrigues/face-recog-sys:job-mssql-v1
             ports:
               - containerPort: 6379
                 name: gcs-server
@@ -135,7 +135,7 @@ spec:
         spec:
           containers:
           - name: ray-worker
-            image: vilsonrodrigues/face-recog-job:2.7.1-py310-ort-openvino-mssql-qdrant
+            image: vilsonrodrigues/face-recog-sys:job-mssql-v1
             lifecycle:
               preStop:
                 exec:
