@@ -75,7 +75,7 @@ if __name__ == "__main__":
     # data access
 
     # this env say which the column from image in database       
-    img_input_key = int(os.getenv("IMAGE_INPUT_KEY"))
+    img_input_key = os.getenv("IMAGE_INPUT_KEY")
 
     # batch app
 
