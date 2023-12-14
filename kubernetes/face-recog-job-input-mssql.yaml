@@ -118,7 +118,7 @@ spec:
                 # warning, if True, a collection will be recreate from zero
                 # use if non exist
               - name: IF_CREATE_COLLECTION
-                value: "False"
+                value: "True"
           volumes:
             - name: ray-logs
               emptyDir: {}    
