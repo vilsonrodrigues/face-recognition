@@ -182,11 +182,11 @@ spec:
                 name: ray-logs
             env:
               - name: RAY_GRAFANA_IFRAME_HOST
-                value: http://0.0.0.0:3000
+                value: "http://127.0.0.1:3000"
               - name: RAY_GRAFANA_HOST
-                value: http://prometheus-grafana.prometheus-system.svc:80
+                value: "http://prometheus-grafana.prometheus-system.svc:80"
               - name: RAY_PROMETHEUS_HOST
-                value: http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090
+                value: "http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090"
               #  models and func configs              
               - name: APPLY_RESIZE
                 value: "True"
