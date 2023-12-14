@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # models configs
 
     apply_resize_ul = os.getenv("APPLY_RESIZE_ULTRA_LIGHT", default="True")
-    apply_resize = False if apply_resize_ul == "True" else True
+    apply_resize = True if apply_resize_ul == "True" else False
 
     backend = os.getenv("BACKEND", default="openvino")
 
