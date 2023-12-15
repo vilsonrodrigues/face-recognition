@@ -1,5 +1,6 @@
 import io
 import base64
+from typing import Any, Dict
 
 import numpy as np
 from PIL import Image
@@ -64,11 +65,11 @@ def convert_numpy_to_base64(array: np.ndarray) -> bytes:
     base64_string = base64_encoded.decode("utf-8")
     return base64_string
 
-def validate_img_bytes_to_numpy(sample, input_key: str) -> bool:
+def validate_img_bytes_to_numpy(input_key: str, sample: Dict[str, Any]) -> bool:
     """ Helper function to filter images into bytes that cannot be converted to numpy
     Args:
+        input_key: col name     
         sample: ray dataset sample
-        input_key: col name 
     Returns:
         True if is valid, False if is not valid
            
