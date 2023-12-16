@@ -83,9 +83,11 @@ if __name__ == "__main__":
 
     ds = ray.data.read_sql(db_query, create_connection)
 
-    ds = ds.filter(partial(validate_img_bytes_to_numpy, img_input_key))   
-
     logger.info(f"Dataset num lines: {ds.count()}")
+
+    logger.info(f"Dataset schema: \n{ds.schema().base_schema}")    
+
+    ds = ds.filter(partial(validate_img_bytes_to_numpy, img_input_key))   
 
     ns = NeuralSearch(
         url=url,
