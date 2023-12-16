@@ -10,6 +10,8 @@ from jose import JWTError, jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+auth_secret_key = os.getenv("AUTH_SECRET_KEY", default="")
+auth_algorithm = os.getenv("AUTH_ALGORITHM", default="HS512")
 
 def verify_token(token: str = Depends(oauth2_scheme)):
     """
@@ -43,11 +45,8 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         return {"message": "Access granted to protected data"}
     ```
     """
-    auth_secret_key = os.getenv("AUTH_SECRET_KEY")
-
     # if env is defined
-    if auth_secret_key:
-        auth_algorithm = os.getenv("AUTH_ALGORITHM", default="HS512")
+    if auth_secret_key != "":
 
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
