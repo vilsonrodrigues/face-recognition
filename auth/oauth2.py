@@ -13,7 +13,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def verify_token(token: str = Depends(oauth2_scheme)):
     """
-    Verify the validity of a JWT token.
+    Verify the validity of a JWT token. If a secret key is not
+    set, so the function allow any request.
 
     Args:
         token: The JWT token obtained from the client.
@@ -43,14 +44,21 @@ def verify_token(token: str = Depends(oauth2_scheme)):
     ```
     """
     auth_secret_key = os.getenv("AUTH_SECRET_KEY")
-    auth_algorithm = os.getenv("AUTH_ALGORITHM", default="HS512")
 
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        jwt.decode(token, auth_secret_key, algorithms=[auth_algorithm])
-    except JWTError:
-        raise credentials_exception
+    # if env is defined
+    if auth_secret_key:
+        auth_algorithm = os.getenv("AUTH_ALGORITHM", default="HS512")
+
+        credentials_exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+        try:
+            jwt.decode(token, auth_secret_key, algorithms=[auth_algorithm])
+        except JWTError:
+            raise credentials_exception
+
+    # allow any request
+    else:
+        return
