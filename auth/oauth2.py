@@ -31,7 +31,7 @@ def verify_token(token: str = Depends(oauth2_scheme)):
     the provided JWT token is valid before allowing access to protected resources.
 
     Example:
-    ```python
+    ``` python
     from fastapi import FastAPI, Depends, HTTPException
 
     app = FastAPI()
