@@ -13,7 +13,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 auth_secret_key = os.getenv("AUTH_SECRET_KEY", default="")
 auth_algorithm = os.getenv("AUTH_ALGORITHM", default="HS512")
 
-def verify_token(token: str = Depends(oauth2_scheme)):
+async def verify_token(token: str = Depends(oauth2_scheme)):
     """
     Verify the validity of a JWT token. If a secret key is not
     set, so the function allow any request.
