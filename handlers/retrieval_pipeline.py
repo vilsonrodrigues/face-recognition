@@ -4,19 +4,13 @@ from io import BytesIO
 from typing import Annotated
 
 import numpy as np
-from fastapi import (
-    FastAPI, 
-    File, 
-    Form, 
-    HTTPException, 
-    UploadFile, 
-    status
-)    
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from ray import serve
 from ray.serve.handle import DeploymentHandle
 
+from auth.oauth2 import verify_token
 from processing.utils import check_img_channels
 from schemas.responses import FaceResponse
 
@@ -110,7 +104,11 @@ class PipelineRetrieval:
                 "boxes": await boxes_rescaled,
             }
 
-    @app.post("/uploadfile", status_code=status.HTTP_200_OK)
+    @app.post(
+        "/uploadfile",
+        status_code=status.HTTP_200_OK,
+        dependencies=[Depends(verify_token)],
+    )
     async def uploadfile_router(
         self,
         file: Annotated[UploadFile, File(description="Image", media_type="image/*")],
@@ -121,16 +119,20 @@ class PipelineRetrieval:
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
             if check_img_channels(image_np) == False:
-                raise ValueError("Image has invalid dimensions")            
+                raise ValueError("Image has invalid dimensions")
         except:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format"
+            )
         try:
             response = await self._route(image_np)
             return response
-        except:
+        except Exception as e:
             raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
 
-    @app.post("/base64", status_code=status.HTTP_200_OK)
+    @app.post(
+        "/base64", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_token)]
+    )
     async def base64_router(
         self, image_base64: Annotated[str, Form(..., description="Base64 Image")]
     ):
@@ -140,9 +142,11 @@ class PipelineRetrieval:
             image_pillow = Image.open(BytesIO(image_bytes))
             image_np = np.array(image_pillow)
             if check_img_channels(image_np) == False:
-                raise ValueError("Image has invalid dimensions")                 
+                raise ValueError("Image has invalid dimensions")
         except:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format")
+            raise HTTPException(
+                status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid image format"
+            )
         try:
             response = await self._route(image_np)
             return response
