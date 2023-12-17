@@ -1,7 +1,7 @@
 """
 Need:
-python-jose
-typing_extensions==4.7.1
+    python-jose
+    typing_extensions==4.9.0
 """
 import os
 from fastapi import Depends, HTTPException, status
