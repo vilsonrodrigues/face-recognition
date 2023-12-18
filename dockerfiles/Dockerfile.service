@@ -7,6 +7,7 @@ COPY requirements-svc.txt .
 
 RUN pip install -r requirements-svc.txt
 
+COPY auth/ auth/ 
 COPY base/ base/
 COPY face_detection/ face_detection/ 
 COPY face_embedding/ face_embedding/
