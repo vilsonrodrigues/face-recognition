@@ -18,7 +18,7 @@ spec:
 
   # rayClusterSpec specifies the RayCluster instance to be created by the RayJob controller.
   rayClusterSpec:
-    rayVersion: '2.7.1' # should match the Ray version in the image of the containers
+    rayVersion: '2.8.1' # should match the Ray version in the image of the containers
     # Ray head pod template
     headGroupSpec:
       # The `rayStartParams` are used to configure the `ray start` command.
@@ -31,7 +31,7 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-sys:job-mssql-v1
+            image: vilsonrodrigues/face-recog-sys:job-mssql-v4
             ports:
               - containerPort: 6379
                 name: gcs-server
@@ -135,7 +135,21 @@ spec:
         spec:
           containers:
           - name: ray-worker
-            image: vilsonrodrigues/face-recog-sys:job-mssql-v1
+            image: vilsonrodrigues/face-recog-sys:job-mssql-v4
+            env:
+              # Bugs can be generated if envs are not available on workers
+              - name: MSSQL_DB_QUERY
+                value: "SELECT * FROM mytable" # update
+              - name: MSSQL_DB_NAME
+                value: "MY_DB" # update
+              - name: MSSQL_DB_USER
+                value: "user" # update
+              - name: MSSQL_DB_PASSWORD
+                value: "password" # update
+              - name: MSSQL_DB_IP_PORT
+                value: "172.0.0.1,14334" # update
+              - name: IMAGE_INPUT_KEY
+                value: "photo" # update
             lifecycle:
               preStop:
                 exec:
@@ -146,10 +160,10 @@ spec:
             resources:
               limits:
                 cpu: "5"
-                memory: "23Gi"
+                memory: "13Gi"
               requests:
                 cpu: "5"
-                memory: "23Gi"
+                memory: "13Gi"
           # use volumes
           # Refer to https://kubernetes.io/docs/concepts/storage/volumes/
           volumes:
