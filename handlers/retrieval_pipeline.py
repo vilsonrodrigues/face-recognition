@@ -12,6 +12,7 @@ from ray.serve.handle import DeploymentHandle
 
 from auth.oauth2 import verify_token
 from processing.utils import check_img_channels
+from observability.loggers import serve_logger
 from schemas.responses import FaceResponse
 
 app = FastAPI()
@@ -128,7 +129,8 @@ class PipelineRetrieval:
             response = await self._route(image_np)
             return response
         except Exception as e:
-            raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")
+            serve_logger.warning(str(e))
+            raise HTTPException(status.HTTP_424_FAILED_DEPENDENCY, "Retrive failed")            
 
     @app.post(
         "/base64", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_token)]
