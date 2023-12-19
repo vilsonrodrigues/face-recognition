@@ -156,7 +156,7 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+            image: vilsonrodrigues/face-recog-sys:svc-v5
             resources:
               limits:
                 cpu: 1
@@ -187,6 +187,35 @@ spec:
                 value: "http://prometheus-grafana.prometheus-system.svc:80"
               - name: RAY_PROMETHEUS_HOST
                 value: "http://prometheus-kube-prometheus-prometheus.prometheus-system.svc:9090"
+              # models and func configs              
+              - name: APPLY_RESIZE
+                value: "True"
+              - name: BACKEND_MOB_FACENET
+                value: "openvino"
+              - name: BACKEND_ULTRA_LIGHT  
+                value: "openvino"                
+              - name: WARMUP_ROUNDS
+                value: "3"
+              # Qdrant configs
+              - name: QDRANT_COLLECTION_NAME
+                value: "faces"
+              - name: QDRANT_URL
+                value: "0.0.0.0"
+              - name: QDRANT_PORT
+                value: "6333"
+              - name: QDRANT_GRPC_PORT
+                value: "6334"
+              - name: QDRANT_PREFER_GRPC
+                value: "True"
+              - name: QDRANT_HTTPS
+                value: "False"
+              - name: QDRANT_TOP_K
+                value: "1"
+              # auth jwt
+              - name: AUTH_SECRET_KEY
+                value: "" # update
+              - name: AUTH_ALGORITHM
+                value: "HS512" # update                    
           volumes:
             - name: ray-logs
               emptyDir: {}    
@@ -207,9 +236,10 @@ spec:
           spec:
             containers:
             - name: ray-worker # must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc'
-              image: vilsonrodrigues/face-recog-svc:ray-2.7.1-py310
+              image: vilsonrodrigues/face-recog-sys:svc-v5
               env:
-                #  models and func configs              
+                # replica env is necessary in failed case
+                # models and func configs              
                 - name: APPLY_RESIZE
                   value: "True"
                 - name: BACKEND_MOB_FACENET
@@ -233,6 +263,11 @@ spec:
                   value: "False"
                 - name: QDRANT_TOP_K
                   value: "1"
+                # auth jwt
+                - name: AUTH_SECRET_KEY
+                  value: "" # update
+                - name: AUTH_ALGORITHM
+                  value: "HS512" # update                                
               lifecycle:
                 preStop:
                   exec:
