@@ -31,7 +31,7 @@ spec:
         spec:
           containers:
           - name: ray-head
-            image: vilsonrodrigues/face-recog-sys:job-hf_hub-v1
+            image: vilsonrodrigues/face-recog-sys:job-hf_hub-v2
             ports:
               - containerPort: 6379
                 name: gcs-server
@@ -129,7 +129,7 @@ spec:
         spec:
           containers:
           - name: ray-worker
-            image: vilsonrodrigues/face-recog-sys:job-hf_hub-v1
+            image: vilsonrodrigues/face-recog-sys:job-hf_hub-v2
             lifecycle:
               preStop:
                 exec:
