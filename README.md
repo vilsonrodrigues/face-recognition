@@ -9,15 +9,17 @@
 
 <h2> Overview </h2> 
 
-The goal this project was to build a lightweight and scalable face recognition system. Efficient and lightweight models were selected. [Ultra LightWeight](https://github.com//) face detector and [Mobile FaceNet](https://github.com/Linzaerfoamliu/MobileFaceNet) to feature extraction.
+The goal this project was to build a lightweight and scalable face recognition system. To solve bottlenecks as serial pre and post processing and slow face matching some strategies were adopted.
 
-Preprocessing steps were fusioned on both models. NMS layers were add to face detector using ONNX. IoU thresh was 0.5 and conf thresh were 0.95. The models graphs are simplified using [ONNX-sim](https://github.com/daquexian/onnx-simplifier)
+Efficient and lightweight models were selected. [Ultra LightWeight](https://github.com//) face detector and [Mobile FaceNet](https://github.com/Linzaerfoamliu/MobileFaceNet) to feature extraction.
+
+Preprocessing steps were fusioned on both models. NMS layers were add to face detector using ONNX. IoU thresh was 0.5 and conf thresh were 0.95. The models graphs are simplified using [ONNX-sim](https://github.com/daquexian/onnx-simplifier).
 
 [ONNX Runtime](https://onnxruntime.ai/) with [OpenVINO](https://docs.openvino.ai/2023.2/home.html) are the inference engine for model execution.
 
 [Qdrant](https://qdrant.tech/) is used as a Vector Search Engine (Vector Database) to efficient face matching and data retrieval.
 
-[Ray](https://ray.io) is a python lib to distributed execution in large-scale. Ray Data ingests and processes images. Ray Serve model composition API join five services to face retrieval.
+[Ray](https://ray.io) is a python lib to distributed execution in large-scale. Ray runs on laptop, clouds, Kubernetes or on-promise. In this project, Ray Data ingests and processes images. Ray Serve model composition API join five services to face retrieval. [FastAPI](https://fastapi.tiangolo.com/) is integrate to recive HTTP requests.
 
 <h2> Getting Started </h2> 
 
@@ -151,7 +153,17 @@ kubectl delete -f job_lfw.yaml
 
 <img src="assets\face-retrieval.png">
 
-JWT tokens are supporteds. You need configure two envs: `AUTH_ALGORITHM` and `AUTH_SECRET_KEY`. Check RayService manifest to configure Qdrant params and more.
+The online service will information retrieval based-on an input image. Check API routers:
+
+| Method | Router          | Data Type  |
+|--------|----------------|---------------|
+| POST   | /base64        | String        |
+| POST   | /uploadfile    | Bytes    |
+| GET    | /              | -             |
+
+The API output is a JSON with two fields: `payloads` and `boxes`.
+
+CORS are configured by default. JWT tokens are supporteds. You need configure two envs: `AUTH_ALGORITHM` and `AUTH_SECRET_KEY`. Check RayService manifest to configure Qdrant params and more.
 
 ``` shell
 kubectl apply -f kubernetes/face-recog-svc.yaml
