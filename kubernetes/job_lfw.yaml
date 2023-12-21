@@ -3,7 +3,7 @@ kind: RayJob
 metadata:
   name: rayjob-lfw
 spec:
-  entrypoint: python job_lfw.py
+  entrypoint: python job_hf.py
 
   # shutdownAfterJobFinishes specifies whether the RayCluster should be deleted after the RayJob finishes. Default is false.
   shutdownAfterJobFinishes: true
