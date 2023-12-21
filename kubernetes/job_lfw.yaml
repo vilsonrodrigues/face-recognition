@@ -1,9 +1,9 @@
 apiVersion: ray.io/v1
 kind: RayJob
 metadata:
-  name: rayjob-iif
+  name: rayjob-lfw
 spec:
-  entrypoint: python job_identification-in-football.py
+  entrypoint: python job_lfw.py
 
   # shutdownAfterJobFinishes specifies whether the RayCluster should be deleted after the RayJob finishes. Default is false.
   shutdownAfterJobFinishes: true
@@ -103,9 +103,9 @@ spec:
                 value: "True"
               # dataset configs
               - name: DATASET_REPO_ID
-                value: "vilsonrodrigues/identification-in-football"
+                value: "vilsonrodrigues/lfw"
               - name: DATASET_FILENAME
-                value: "football_ingestion.zip"                
+                value: "lfw_multifaces-ingestion.zip"                
           volumes:
             - name: ray-logs
               emptyDir: {}    
