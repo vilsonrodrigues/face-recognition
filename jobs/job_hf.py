@@ -59,6 +59,12 @@ if __name__ == "__main__":
 
     # scale configs
 
+    num_cpus_to_basic_func = float(os.getenv("NUM_CPUS_TO_BASIC_FUNC", default="0.3"))
+
+    num_cpus_to_models = float(os.getenv("NUM_CPUS_TO_MODELS", default="1.0"))
+
+    num_gpus_to_models = float(os.getenv("NUM_GPUS_TO_MODELS", default="0.0"))
+
     num_actors_to_basic_func = int(os.getenv("NUM_ACTORS_TO_BASIC_FUNC", default="1"))
 
     num_actors_to_models = int(os.getenv("NUM_ACTORS_TO_MODELS", default="1"))
@@ -98,6 +104,7 @@ if __name__ == "__main__":
 
     print("Start map batch processing")
 
+
     ds_embeddings = (
         ds.map_batches(
             UltraLightORTBatchPredictor,
@@ -105,6 +112,8 @@ if __name__ == "__main__":
             batch_format="numpy",
             compute=ray.data.ActorPoolStrategy(size=num_actors_to_models),
             zero_copy_batch=True,
+            num_gpus=num_gpus_to_models,
+            num_cpus=num_cpus_to_models,            
             fn_constructor_kwargs=dict(
                 model_path=model_path_ultra_light,
                 input_key="image",
@@ -116,6 +125,7 @@ if __name__ == "__main__":
             BatchFacePostProcessing,
             batch_size=batch_size_funcs,
             batch_format="numpy",
+            num_cpus=num_cpus_to_basic_func,
             compute=ray.data.ActorPoolStrategy(size=num_actors_to_basic_func),
             zero_copy_batch=True,
             fn_constructor_kwargs=dict(input_key="original_image", output_key="face"),
@@ -124,6 +134,8 @@ if __name__ == "__main__":
             MobileFaceNetORTBatchPredictor,
             batch_size=batch_size_models,
             batch_format="numpy",
+            num_gpus=num_gpus_to_models,
+            num_cpus=num_cpus_to_models,            
             compute=ray.data.ActorPoolStrategy(size=num_actors_to_models),
             zero_copy_batch=True,
             fn_constructor_kwargs=dict(

@@ -78,6 +78,13 @@ spec:
                 value: "./models/mobilefacenet_prep.onnx"
               - name: MODEL_PATH_ULTRA_LIGHT
                 value: "./models/ultralight_RBF_320_prep_nms.onnx"
+              # scale configs
+              - name: NUM_CPUS_TO_BASIC_FUNC
+                value: "0.3"
+              - name: NUM_CPUS_TO_MODELS
+                value: "1.0"
+              - name: NUM_GPUS_TO_MODELS
+                value: "0.0"
               - name: NUM_ACTORS_TO_BASIC_FUNC
                 value: "1"
               - name: NUM_ACTORS_TO_MODELS
